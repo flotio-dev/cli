@@ -31,21 +31,27 @@ func TestResolveHost(t *testing.T) {
 	os.Unsetenv("FLOTIO_HOST")
 	FlagHost = ""
 	cfg := DefaultConfig()
-	if got := cfg.ResolveHost(); got != "api.flotio.ovh" {
-		t.Errorf("default: expected api.flotio.ovh, got %s", got)
+	if got := cfg.ResolveHost(); got != "https://api.flotio.ovh" {
+		t.Errorf("default: expected https://api.flotio.ovh, got %s", got)
 	}
 
 	// Env overrides config file
 	os.Setenv("FLOTIO_HOST", "custom.example.com")
 	cfg.Host = "" // clear config value so env kicks in
-	if got := cfg.ResolveHost(); got != "custom.example.com" {
-		t.Errorf("env: expected custom.example.com, got %s", got)
+	if got := cfg.ResolveHost(); got != "https://custom.example.com" {
+		t.Errorf("env: expected https://custom.example.com, got %s", got)
+	}
+
+	// Env with explicit scheme
+	os.Setenv("FLOTIO_HOST", "http://localhost:8080")
+	if got := cfg.ResolveHost(); got != "http://localhost:8080" {
+		t.Errorf("env+scheme: expected http://localhost:8080, got %s", got)
 	}
 
 	// Flag overrides everything
 	FlagHost = "flag.example.com"
-	if got := cfg.ResolveHost(); got != "flag.example.com" {
-		t.Errorf("flag: expected flag.example.com, got %s", got)
+	if got := cfg.ResolveHost(); got != "https://flag.example.com" {
+		t.Errorf("flag: expected https://flag.example.com, got %s", got)
 	}
 }
 
@@ -60,8 +66,37 @@ func TestResolveHostFromConfigFileValue(t *testing.T) {
 	os.Unsetenv("FLOTIO_HOST")
 
 	cfg := &Config{Host: "config.example.com"}
-	if got := cfg.ResolveHost(); got != "config.example.com" {
-		t.Errorf("expected config.example.com, got %s", got)
+	if got := cfg.ResolveHost(); got != "https://config.example.com" {
+		t.Errorf("expected https://config.example.com, got %s", got)
+	}
+
+	// Config with explicit scheme
+	cfg = &Config{Host: "http://config.example.com:8080"}
+	if got := cfg.ResolveHost(); got != "http://config.example.com:8080" {
+		t.Errorf("with scheme: expected http://config.example.com:8080, got %s", got)
+	}
+}
+
+func TestResolveHostOnly(t *testing.T) {
+	origFlag := FlagHost
+	origHost := os.Getenv("FLOTIO_HOST")
+	defer func() {
+		FlagHost = origFlag
+		os.Setenv("FLOTIO_HOST", origHost)
+	}()
+	FlagHost = ""
+	os.Unsetenv("FLOTIO_HOST")
+
+	// Plain hostname
+	cfg := DefaultConfig()
+	if got := cfg.ResolveHostOnly(); got != "api.flotio.ovh" {
+		t.Errorf("expected api.flotio.ovh, got %s", got)
+	}
+
+	// Full URL should extract hostname
+	cfg.Host = "http://localhost:8080"
+	if got := cfg.ResolveHostOnly(); got != "localhost:8080" {
+		t.Errorf("expected localhost:8080, got %s", got)
 	}
 }
 
