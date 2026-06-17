@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/flotio-dev/cli/internal/config"
 	"github.com/flotio-dev/cli/pkg/client"
 	"github.com/spf13/cobra"
 )
@@ -12,6 +13,7 @@ var envCmd = &cobra.Command{
 	Short: "Manage environment variables and files",
 	Long:  `Create, list, update, and delete environment assets (variables and files).`,
 	Example: `  flotio env list
+  flotio env list --project 1
   flotio env create DATABASE_URL "postgres://..." 
   flotio env create .env.production "$(cat .env.prod)" --type file --path .env
   flotio env update 1 --value "new-value"
@@ -26,8 +28,22 @@ var envListCmd = &cobra.Command{
 		if !client.IsLoggedIn() {
 			return fmt.Errorf("not logged in")
 		}
+
+		// Build URL with optional project_id filter
+		url := "/env"
+		pid, _ := cmd.Flags().GetInt64("project")
+		if pid == 0 {
+			// Try .flotio.yaml
+			if id, err := config.ResolveProjectID(0); err == nil {
+				pid = id
+			}
+		}
+		if pid > 0 {
+			url = fmt.Sprintf("/env?project_id=%d", pid)
+		}
+
 		var raw map[string]interface{}
-		if err := client.GetJSON(cfg.ResolveHost(), "/env", &raw); err != nil {
+		if err := client.GetJSON(cfg.ResolveHost(), url, &raw); err != nil {
 			return fmt.Errorf("listing env: %w", err)
 		}
 		items, _ := client.ExtractList(raw)
@@ -40,7 +56,12 @@ var envListCmd = &cobra.Command{
 			if !ok {
 				continue
 			}
-			fmt.Printf("  [%v] %-6v %-20v = %v\n", item["id"], item["type"], item["key"], item["value"])
+			pid := item["project_id"]
+			if pid == nil {
+				pid = "-"
+			}
+			fmt.Printf("  [%v] %-6v %-25v = %v  (project: %v)\n",
+				item["id"], item["type"], item["key"], item["value"], pid)
 		}
 		return nil
 	},
@@ -59,11 +80,15 @@ var envGetCmd = &cobra.Command{
 		if err := client.GetJSON(cfg.ResolveHost(), "/env/"+args[0], &e); err != nil {
 			return fmt.Errorf("getting env: %w", err)
 		}
-		fmt.Printf("Key:   %v\n", e["key"])
-		fmt.Printf("Type:  %v\n", e["type"])
-		fmt.Printf("Value: %v\n", e["value"])
+		fmt.Printf("Key:       %v\n", e["key"])
+		fmt.Printf("Type:      %v\n", e["type"])
+		fmt.Printf("Value:     %v\n", e["value"])
+		fmt.Printf("Project:   %v\n", e["project_id"])
 		if p, ok := e["path"]; ok && p != nil && p != "" {
-			fmt.Printf("Path:  %v\n", p)
+			fmt.Printf("Path:      %v\n", p)
+		}
+		if b, ok := e["is_base64"]; ok && b != nil && b != false {
+			fmt.Println("Encoding:  base64")
 		}
 		return nil
 	},
@@ -152,6 +177,7 @@ func init() {
 	envCreateCmd.Flags().Int64("project", 0, "Project ID to associate with")
 	envCreateCmd.Flags().String("path", "", "Target path (for file type)")
 	envUpdateCmd.Flags().String("value", "", "New value")
+	envListCmd.Flags().Int64("project", 0, "Filter by project ID")
 
 	envCmd.AddCommand(envListCmd)
 	envCmd.AddCommand(envGetCmd)
