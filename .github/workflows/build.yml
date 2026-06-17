@@ -10,30 +10,21 @@ on:
 
 jobs:
   build:
-    name: Build (${{ matrix.os }}/${{ matrix.arch }})
-    runs-on: ${{ matrix.runner }}
+    name: Build
+    runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
       matrix:
         include:
-          # Linux
           - os: linux
             arch: amd64
-            runner: ubuntu-latest
           - os: linux
             arch: arm64
-            runner: ubuntu-24.04-arm
-          # macOS
           - os: darwin
             arch: amd64
-            runner: macos-13
           - os: darwin
             arch: arm64
-            runner: macos-latest
-          # Windows
           - os: windows
             arch: amd64
-            runner: windows-latest
 
     steps:
       - uses: actions/checkout@v4
@@ -45,11 +36,10 @@ jobs:
       - name: Build
         run: |
           mkdir -p dist
-          BINARY="flotio-${{ matrix.os }}-${{ matrix.arch }}"
-          if [ "${{ matrix.os }}" = "windows" ]; then
-            BINARY="${BINARY}.exe"
-          fi
-          go build -o "dist/${BINARY}" .
+          ext=""
+          if [ "${{ matrix.os }}" = "windows" ]; then ext=".exe"; fi
+          BINARY="flotio-${{ matrix.os }}-${{ matrix.arch }}${ext}"
+          GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -o "dist/${BINARY}" .
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
