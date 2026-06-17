@@ -11,22 +11,27 @@ var projectConfigCmd = &cobra.Command{
 	Use:   "config",
 	Short: "Manage project configuration",
 	Long:  `View and update project-level configuration (Flutter version, platforms, build mode, etc.).`,
-	Example: `  flotio config get 1
-  flotio config update 1 --flutter 3.27.4 --mode release --platform android
-  flotio config delete 1`,
+	Example: `  flotio config get
+  flotio config get 1
+  flotio config update --flutter 3.27.4 --mode release --platform android
+  flotio config delete`,
 }
 
 var configGetCmd = &cobra.Command{
-	Use:     "get <project-id>",
+	Use:     "get [project-id]",
 	Short:   "Get project configuration",
-	Args:    cobra.ExactArgs(1),
-	Example: `  flotio config get 1`,
+	Args:    cobra.MaximumNArgs(1),
+	Example: `  flotio config get`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if !client.IsLoggedIn() {
 			return fmt.Errorf("not logged in")
 		}
+		id, err := projectIDArg(args)
+		if err != nil {
+			return err
+		}
 		var result map[string]interface{}
-		if err := client.GetJSON(cfg.ResolveHost(), "/project/"+args[0]+"/config", &result); err != nil {
+		if err := client.GetJSON(cfg.ResolveHost(), "/project/"+id+"/config", &result); err != nil {
 			return fmt.Errorf("getting config: %w", err)
 		}
 		fmt.Printf("Git Repo:       %v\n", result["git_repo"])
@@ -41,13 +46,17 @@ var configGetCmd = &cobra.Command{
 }
 
 var configUpdateCmd = &cobra.Command{
-	Use:     "update <project-id>",
+	Use:     "update [project-id]",
 	Short:   "Update project configuration",
-	Args:    cobra.ExactArgs(1),
-	Example: `  flotio config update 1 --flutter 3.27.4 --mode release`,
+	Args:    cobra.MaximumNArgs(1),
+	Example: `  flotio config update --flutter 3.27.4 --mode release`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if !client.IsLoggedIn() {
 			return fmt.Errorf("not logged in")
+		}
+		id, err := projectIDArg(args)
+		if err != nil {
+			return err
 		}
 		body := map[string]interface{}{}
 		if f := flagStr(cmd, "flutter"); f != "" {
@@ -64,27 +73,31 @@ var configUpdateCmd = &cobra.Command{
 			body["platforms"] = platforms
 		}
 
-		if err := client.PostJSON(cfg.ResolveHost(), "/project/"+args[0]+"/config", body, nil); err != nil {
+		if err := client.PostJSON(cfg.ResolveHost(), "/project/"+id+"/config", body, nil); err != nil {
 			return fmt.Errorf("updating config: %w", err)
 		}
-		fmt.Printf("✓ Config for project %s updated\n", args[0])
+		fmt.Printf("✓ Config for project %s updated\n", id)
 		return nil
 	},
 }
 
 var configDeleteCmd = &cobra.Command{
-	Use:     "delete <project-id>",
+	Use:     "delete [project-id]",
 	Short:   "Delete project configuration",
-	Args:    cobra.ExactArgs(1),
-	Example: `  flotio config delete 1`,
+	Args:    cobra.MaximumNArgs(1),
+	Example: `  flotio config delete`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if !client.IsLoggedIn() {
 			return fmt.Errorf("not logged in")
 		}
-		if err := client.DeleteJSON(cfg.ResolveHost(), "/project/"+args[0]+"/config"); err != nil {
+		id, err := projectIDArg(args)
+		if err != nil {
+			return err
+		}
+		if err := client.DeleteJSON(cfg.ResolveHost(), "/project/"+id+"/config"); err != nil {
 			return fmt.Errorf("deleting config: %w", err)
 		}
-		fmt.Printf("✓ Config for project %s deleted\n", args[0])
+		fmt.Printf("✓ Config for project %s deleted\n", id)
 		return nil
 	},
 }

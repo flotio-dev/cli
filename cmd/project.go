@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/flotio-dev/cli/pkg/api/client/projects"
@@ -15,10 +14,10 @@ var projectCmd = &cobra.Command{
 	Short: "Manage projects",
 	Long:  `Create, list, update, and delete Flotio projects.`,
 	Example: `  flotio project list
-  flotio project get 1
+  flotio project get
   flotio project create "My App" --repo https://github.com/user/repo --platform android
-  flotio project update 1 --name "New Name"
-  flotio project delete 1`,
+  flotio project update --name "New Name"
+  flotio project delete`,
 }
 
 var projectListCmd = &cobra.Command{
@@ -46,16 +45,21 @@ var projectListCmd = &cobra.Command{
 }
 
 var projectGetCmd = &cobra.Command{
-	Use:   "get <id>",
-	Short: "Get a project by ID",
-	Args:  cobra.ExactArgs(1),
+	Use:     "get [id]",
+	Short:   "Get a project by ID",
+	Args:    cobra.MaximumNArgs(1),
+	Example: `  flotio project get`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if !client.IsLoggedIn() {
 			return fmt.Errorf("not logged in")
 		}
-		id, err := strconv.ParseInt(args[0], 10, 64)
+		arg := ""
+		if len(args) > 0 {
+			arg = args[0]
+		}
+		id, err := parseProjectID(arg)
 		if err != nil {
-			return fmt.Errorf("invalid project ID: %s", args[0])
+			return err
 		}
 		params := projects.NewGetProjectIDParams().WithID(id)
 		resp, err := api.Projects.GetProjectID(params)
@@ -105,16 +109,21 @@ var projectCreateCmd = &cobra.Command{
 }
 
 var projectUpdateCmd = &cobra.Command{
-	Use:   "update <id>",
-	Short: "Update a project",
-	Args:  cobra.ExactArgs(1),
+	Use:     "update [id]",
+	Short:   "Update a project",
+	Args:    cobra.MaximumNArgs(1),
+	Example: `  flotio project update --name "New Name"`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if !client.IsLoggedIn() {
 			return fmt.Errorf("not logged in")
 		}
-		id, err := strconv.ParseInt(args[0], 10, 64)
+		arg := ""
+		if len(args) > 0 {
+			arg = args[0]
+		}
+		id, err := parseProjectID(arg)
 		if err != nil {
-			return fmt.Errorf("invalid project ID: %s", args[0])
+			return err
 		}
 		name, _ := cmd.Flags().GetString("name")
 		if name == "" {
@@ -138,16 +147,21 @@ var projectUpdateCmd = &cobra.Command{
 }
 
 var projectDeleteCmd = &cobra.Command{
-	Use:   "delete <id>",
-	Short: "Delete a project",
-	Args:  cobra.ExactArgs(1),
+	Use:     "delete [id]",
+	Short:   "Delete a project",
+	Args:    cobra.MaximumNArgs(1),
+	Example: `  flotio project delete`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if !client.IsLoggedIn() {
 			return fmt.Errorf("not logged in")
 		}
-		id, err := strconv.ParseInt(args[0], 10, 64)
+		arg := ""
+		if len(args) > 0 {
+			arg = args[0]
+		}
+		id, err := parseProjectID(arg)
 		if err != nil {
-			return fmt.Errorf("invalid project ID: %s", args[0])
+			return err
 		}
 		params := projects.NewDeleteProjectIDParams().WithID(id)
 		_, err = api.Projects.DeleteProjectID(params)

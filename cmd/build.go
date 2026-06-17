@@ -13,26 +13,31 @@ var buildCmd = &cobra.Command{
 	Use:   "build",
 	Short: "Manage builds",
 	Long:  `Trigger, monitor, and manage Flotio builds for your projects.`,
-	Example: `  flotio build start 1 --branch main --platform android --mode release
-  flotio build list 1
-  flotio build logs 1 42
-  flotio build download 1 42
-  flotio build cancel 1 42
-  flotio build delete 1 42`,
+	Example: `  flotio build start --branch main --platform android --mode release
+  flotio build start 1 --branch main --platform android --mode release
+  flotio build list
+  flotio build logs 42
+  flotio build download 42
+  flotio build cancel 42
+  flotio build delete 42`,
 }
 
 var buildStartCmd = &cobra.Command{
-	Use:   "start <project-id>",
-	Short: "Trigger a new build",
-	Example: `  flotio build start 1 --branch main --platform android --mode release --target aab`,
-	Args:  cobra.ExactArgs(1),
+	Use:     "start [project-id]",
+	Short:   "Trigger a new build",
+	Example: `  flotio build start --branch main --platform android --mode release --target aab`,
+	Args:    cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if !client.IsLoggedIn() {
 			return fmt.Errorf("not logged in")
 		}
-		projectID, err := strconv.ParseInt(args[0], 10, 64)
+		arg := ""
+		if len(args) > 0 {
+			arg = args[0]
+		}
+		projectID, err := parseProjectID(arg)
 		if err != nil {
-			return fmt.Errorf("invalid project ID: %s", args[0])
+			return err
 		}
 		branch, _ := cmd.Flags().GetString("branch")
 		platform, _ := cmd.Flags().GetString("platform")
@@ -40,10 +45,10 @@ var buildStartCmd = &cobra.Command{
 		target, _ := cmd.Flags().GetString("target")
 
 		body := &BuildRequest{
-			GitBranch:    branch,
-			Platform:     platform,
-			BuildMode:    mode,
-			BuildTarget:  target,
+			GitBranch:   branch,
+			Platform:    platform,
+			BuildMode:   mode,
+			BuildTarget: target,
 		}
 
 		params := builds.NewPostProjectIDBuildParams().WithID(projectID).WithBuild(body)
@@ -58,14 +63,22 @@ var buildStartCmd = &cobra.Command{
 }
 
 var buildListCmd = &cobra.Command{
-	Use:   "list <project-id>",
-	Short: "List builds for a project",
-	Args:  cobra.ExactArgs(1),
+	Use:     "list [project-id]",
+	Short:   "List builds for a project",
+	Args:    cobra.MaximumNArgs(1),
+	Example: `  flotio build list`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if !client.IsLoggedIn() {
 			return fmt.Errorf("not logged in")
 		}
-		projectID, _ := strconv.ParseInt(args[0], 10, 64)
+		arg := ""
+		if len(args) > 0 {
+			arg = args[0]
+		}
+		projectID, err := parseProjectID(arg)
+		if err != nil {
+			return err
+		}
 
 		params := builds.NewGetProjectIDBuildsParams().WithID(projectID)
 		resp, err := api.Builds.GetProjectIDBuilds(params)
@@ -85,16 +98,28 @@ var buildListCmd = &cobra.Command{
 }
 
 var buildLogsCmd = &cobra.Command{
-	Use:     "logs <project-id> <build-id>",
+	Use:     "logs [project-id] <build-id>",
 	Short:   "Get build logs",
-	Example: `  flotio build logs 1 42`,
-	Args:  cobra.ExactArgs(2),
+	Example: `  flotio build logs 42`,
+	Args:    cobra.RangeArgs(1, 2),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if !client.IsLoggedIn() {
 			return fmt.Errorf("not logged in")
 		}
-		projectID, _ := strconv.ParseInt(args[0], 10, 64)
-		buildID, _ := strconv.ParseInt(args[1], 10, 64)
+		projectArg := ""
+		buildArg := args[0]
+		if len(args) == 2 {
+			projectArg = args[0]
+			buildArg = args[1]
+		}
+		projectID, err := parseProjectID(projectArg)
+		if err != nil {
+			return err
+		}
+		buildID, err := strconv.ParseInt(buildArg, 10, 64)
+		if err != nil {
+			return fmt.Errorf("invalid build ID: %s", buildArg)
+		}
 
 		params := builds.NewGetProjectIDBuildBuildIDLogsSyncParams().
 			WithID(projectID).WithBuildID(buildID)
@@ -114,19 +139,32 @@ var buildLogsCmd = &cobra.Command{
 }
 
 var buildCancelCmd = &cobra.Command{
-	Use:   "cancel <project-id> <build-id>",
-	Short: "Cancel a running build",
-	Args:  cobra.ExactArgs(2),
+	Use:     "cancel [project-id] <build-id>",
+	Short:   "Cancel a running build",
+	Args:    cobra.RangeArgs(1, 2),
+	Example: `  flotio build cancel 42`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if !client.IsLoggedIn() {
 			return fmt.Errorf("not logged in")
 		}
-		projectID, _ := strconv.ParseInt(args[0], 10, 64)
-		buildID, _ := strconv.ParseInt(args[1], 10, 64)
+		projectArg := ""
+		buildArg := args[0]
+		if len(args) == 2 {
+			projectArg = args[0]
+			buildArg = args[1]
+		}
+		projectID, err := parseProjectID(projectArg)
+		if err != nil {
+			return err
+		}
+		buildID, err := strconv.ParseInt(buildArg, 10, 64)
+		if err != nil {
+			return fmt.Errorf("invalid build ID: %s", buildArg)
+		}
 
 		params := builds.NewPutProjectIDBuildBuildIDCancelParams().
 			WithID(projectID).WithBuildID(buildID)
-		_, err := api.Builds.PutProjectIDBuildBuildIDCancel(params)
+		_, err = api.Builds.PutProjectIDBuildBuildIDCancel(params)
 		if err != nil {
 			return fmt.Errorf("cancelling build: %w", err)
 		}
@@ -136,15 +174,28 @@ var buildCancelCmd = &cobra.Command{
 }
 
 var buildDownloadCmd = &cobra.Command{
-	Use:   "download <project-id> <build-id>",
-	Short: "Get download URL for a build artifact",
-	Args:  cobra.ExactArgs(2),
+	Use:     "download [project-id] <build-id>",
+	Short:   "Get download URL for a build artifact",
+	Args:    cobra.RangeArgs(1, 2),
+	Example: `  flotio build download 42`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if !client.IsLoggedIn() {
 			return fmt.Errorf("not logged in")
 		}
-		projectID, _ := strconv.ParseInt(args[0], 10, 64)
-		buildID, _ := strconv.ParseInt(args[1], 10, 64)
+		projectArg := ""
+		buildArg := args[0]
+		if len(args) == 2 {
+			projectArg = args[0]
+			buildArg = args[1]
+		}
+		projectID, err := parseProjectID(projectArg)
+		if err != nil {
+			return err
+		}
+		buildID, err := strconv.ParseInt(buildArg, 10, 64)
+		if err != nil {
+			return fmt.Errorf("invalid build ID: %s", buildArg)
+		}
 
 		params := builds.NewGetProjectIDBuildBuildIDDownloadParams().
 			WithID(projectID).WithBuildID(buildID)
@@ -160,19 +211,32 @@ var buildDownloadCmd = &cobra.Command{
 }
 
 var buildDeleteCmd = &cobra.Command{
-	Use:   "delete <project-id> <build-id>",
-	Short: "Delete a build and its artifacts",
-	Args:  cobra.ExactArgs(2),
+	Use:     "delete [project-id] <build-id>",
+	Short:   "Delete a build and its artifacts",
+	Args:    cobra.RangeArgs(1, 2),
+	Example: `  flotio build delete 42`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if !client.IsLoggedIn() {
 			return fmt.Errorf("not logged in")
 		}
-		projectID, _ := strconv.ParseInt(args[0], 10, 64)
-		buildID, _ := strconv.ParseInt(args[1], 10, 64)
+		projectArg := ""
+		buildArg := args[0]
+		if len(args) == 2 {
+			projectArg = args[0]
+			buildArg = args[1]
+		}
+		projectID, err := parseProjectID(projectArg)
+		if err != nil {
+			return err
+		}
+		buildID, err := strconv.ParseInt(buildArg, 10, 64)
+		if err != nil {
+			return fmt.Errorf("invalid build ID: %s", buildArg)
+		}
 
 		params := builds.NewDeleteProjectIDBuildBuildIDParams().
 			WithID(projectID).WithBuildID(buildID)
-		_, err := api.Builds.DeleteProjectIDBuildBuildID(params)
+		_, err = api.Builds.DeleteProjectIDBuildBuildID(params)
 		if err != nil {
 			return fmt.Errorf("deleting build: %w", err)
 		}
