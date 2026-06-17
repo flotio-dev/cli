@@ -50,13 +50,12 @@ jobs:
             BINARY="${BINARY}.exe"
           fi
           go build -o "dist/${BINARY}" .
-        working-directory: cli
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: flotio-${{ matrix.os }}-${{ matrix.arch }}
-          path: cli/dist/
+          path: dist/
 
   release:
     name: Create Release
