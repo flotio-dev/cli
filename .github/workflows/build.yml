@@ -36,10 +36,17 @@ jobs:
       - name: Build
         run: |
           mkdir -p dist
+          # Extract version from git tag, or use "dev" for non-tag builds
+          VERSION="${{ github.ref_name }}"
+          VERSION="${VERSION#v}"
+          if [ "${{ github.ref_type }}" != "tag" ]; then VERSION="dev"; fi
+
           ext=""
           if [ "${{ matrix.os }}" = "windows" ]; then ext=".exe"; fi
           BINARY="flotio-${{ matrix.os }}-${{ matrix.arch }}${ext}"
-          GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -o "dist/${BINARY}" .
+          GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} \
+            go build -ldflags "-X github.com/flotio-dev/cli/cmd.version=${VERSION}" \
+            -o "dist/${BINARY}" .
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
