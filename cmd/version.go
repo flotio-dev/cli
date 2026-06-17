@@ -16,6 +16,11 @@ import (
 //	go build -ldflags "-X github.com/flotio-dev/cli/cmd.version=v1.2.3" .
 var version = "dev"
 
+type releaseInfo struct {
+	TagName string `json:"tag_name"`
+	Body    string `json:"body"`
+}
+
 var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Print version information",
@@ -23,13 +28,17 @@ var versionCmd = &cobra.Command{
 		fmt.Printf("flotio %s  %s/%s\n", version, runtime.GOOS, runtime.GOARCH)
 
 		// Check for updates
-		latest, err := fetchLatestVersion()
+		rel, err := fetchLatestRelease()
 		if err != nil {
-			return nil // silent — no network or GitHub down
+			return nil // silent
 		}
+		latest := strings.TrimPrefix(rel.TagName, "v")
 		if latest != "" && latest != version && version != "dev" {
 			fmt.Printf("\nUpdate available: %s → %s\n", version, latest)
-			fmt.Printf("Run 'flotio update' to upgrade.\n")
+			if rel.Body != "" {
+				fmt.Println(strings.TrimSpace(rel.Body))
+			}
+			fmt.Printf("\nRun 'flotio update' to upgrade.\n")
 		} else if version == "dev" {
 			fmt.Println("(development build — run 'flotio update' to download latest release)")
 		}
@@ -42,12 +51,30 @@ var updateCmd = &cobra.Command{
 	Short: "Update flotio to the latest version",
 	Long: `Download the latest flotio binary from GitHub Releases and replace the current executable.
 
-Requires write access to the current binary location.`,
+If the current binary requires admin privileges to overwrite (e.g. installed
+in /usr/local/bin), run the install script instead:
+  curl -fsSL https://raw.githubusercontent.com/flotio-dev/cli/main/install.sh | sh`,
 	Example: `  flotio update`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		exe, err := os.Executable()
 		if err != nil {
 			return fmt.Errorf("cannot find current executable: %w", err)
+		}
+
+		// Check write permission
+		if !canWrite(exe) {
+			return fmt.Errorf(
+				"no write permission for %s\n\n"+
+					"The CLI was likely installed with sudo. Update via the install script:\n"+
+					"  curl -fsSL https://raw.githubusercontent.com/flotio-dev/cli/main/install.sh | sh",
+				exe)
+		}
+
+		// Show release notes
+		rel, err := fetchLatestRelease()
+		if err == nil && rel.Body != "" {
+			fmt.Println(strings.TrimSpace(rel.Body))
+			fmt.Println()
 		}
 
 		// Build download URL
@@ -88,7 +115,7 @@ Requires write access to the current binary location.`,
 		// Replace current binary
 		if err := os.Rename(tmp, exe); err != nil {
 			os.Remove(tmp)
-			return fmt.Errorf("replacing binary (try running as admin): %w", err)
+			return fmt.Errorf("replacing binary: %w", err)
 		}
 
 		fmt.Println("✓ flotio updated to latest version")
@@ -96,23 +123,32 @@ Requires write access to the current binary location.`,
 	},
 }
 
-// fetchLatestVersion returns the latest tag from GitHub releases, or "" on error.
-func fetchLatestVersion() (string, error) {
+// canWrite checks if the current process can write to the given file path.
+func canWrite(path string) bool {
+	// Try opening for append — doesn't modify the file, just tests access
+	f, err := os.OpenFile(path, os.O_WRONLY|os.O_APPEND, 0)
+	if err != nil {
+		return false
+	}
+	f.Close()
+	return true
+}
+
+// fetchLatestRelease returns the latest GitHub release info.
+func fetchLatestRelease() (*releaseInfo, error) {
 	resp, err := http.Get("https://api.github.com/repos/flotio-dev/cli/releases/latest")
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != 200 {
-		return "", fmt.Errorf("github API returned %d", resp.StatusCode)
+		return nil, fmt.Errorf("github API returned %d", resp.StatusCode)
 	}
-	var release struct {
-		TagName string `json:"tag_name"`
+	var rel releaseInfo
+	if err := json.NewDecoder(resp.Body).Decode(&rel); err != nil {
+		return nil, err
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&release); err != nil {
-		return "", err
-	}
-	return strings.TrimPrefix(release.TagName, "v"), nil
+	return &rel, nil
 }
 
 func init() {
