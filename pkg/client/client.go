@@ -74,12 +74,20 @@ func ClearTokens() error {
 	return nil
 }
 
-func tokenPath() (string, error) {
+// TokenPathFn returns the path to the auth token file.
+// Overridable in tests.
+var TokenPathFn = defaultTokenPath
+
+func defaultTokenPath() (string, error) {
 	home, err := os.UserHomeDir()
 	if err != nil {
 		return "", fmt.Errorf("home dir: %w", err)
 	}
 	return filepath.Join(home, ".flotio", TokenFile), nil
+}
+
+func tokenPath() (string, error) {
+	return TokenPathFn()
 }
 
 // New creates a new Flotio API client connected to the given host.

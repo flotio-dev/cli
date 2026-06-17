@@ -33,6 +33,9 @@ jobs:
         with:
           go-version: "1.26"
 
+      - name: Test
+        run: go test ./...
+
       - name: Build
         run: |
           mkdir -p dist
