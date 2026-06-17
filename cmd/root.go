@@ -67,5 +67,5 @@ func Execute() error {
 
 func init() {
 	rootCmd.PersistentFlags().StringVar(&config.FlagConfigPath, "config", "", "path to config file (default: $HOME/.flotio/config.yaml)")
-	rootCmd.PersistentFlags().StringVar(&config.FlagHost, "host", "", "API host (default: api.flotio.ovh)")
+	rootCmd.PersistentFlags().StringVar(&config.FlagHost, "host", "", "API host (default: api.flotio.ovh, accepts scheme://host e.g. http://localhost:8080)")
 }

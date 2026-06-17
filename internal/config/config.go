@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"gopkg.in/yaml.v3"
 )
@@ -17,7 +18,7 @@ var FlagHost string
 
 // Config holds all CLI configuration values.
 type Config struct {
-	// Host is the Flotio API host.
+	// Host is the Flotio API host (may include scheme, e.g. "http://localhost:8080").
 	Host string `yaml:"host"`
 
 	// Logging controls log level and format.
@@ -43,7 +44,21 @@ func DefaultConfig() *Config {
 
 // ResolveHost returns the effective API host from (in precedence):
 // 1. --host flag, 2. config file, 3. FLOTIO_HOST env, 4. default.
+// The returned value is a full base URL (scheme://host).
 func (c *Config) ResolveHost() string {
+	raw := c.resolveRaw()
+	return normalizeHost(raw)
+}
+
+// ResolveHostOnly returns just the hostname (without scheme) for the
+// go-swagger generated client, which manages schemes separately.
+func (c *Config) ResolveHostOnly() string {
+	raw := c.resolveRaw()
+	_, host := parseHost(raw)
+	return host
+}
+
+func (c *Config) resolveRaw() string {
 	if FlagHost != "" {
 		return FlagHost
 	}
@@ -54,6 +69,24 @@ func (c *Config) ResolveHost() string {
 		return env
 	}
 	return "api.flotio.ovh"
+}
+
+// normalizeHost ensures the host string has a scheme.
+// If no scheme is present, "https://" is prepended.
+func normalizeHost(raw string) string {
+	if strings.Contains(raw, "://") {
+		return raw
+	}
+	return "https://" + raw
+}
+
+// parseHost splits "scheme://host:port" into (scheme, host).
+// If no scheme is present, defaults to "https".
+func parseHost(raw string) (scheme, host string) {
+	if idx := strings.Index(raw, "://"); idx >= 0 {
+		return raw[:idx], raw[idx+3:]
+	}
+	return "https", raw
 }
 
 func configPath() (string, error) {

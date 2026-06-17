@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 
 	apiclient "github.com/flotio-dev/cli/pkg/api/client"
 	httptransport "github.com/go-openapi/runtime/client"
@@ -92,8 +93,10 @@ func tokenPath() (string, error) {
 
 // New creates a new Flotio API client connected to the given host.
 // If a valid access token is stored, it is injected as Bearer auth.
-func New(host string) *apiclient.FlotioAPI {
-	schemes := []string{"https"}
+// The host can be a plain hostname or scheme://host (scheme is extracted).
+func New(rawHost string) *apiclient.FlotioAPI {
+	scheme, host := parseHost(rawHost)
+	schemes := []string{scheme}
 	transport := httptransport.New(host, "/", schemes)
 
 	// Inject stored bearer token if available.
@@ -112,9 +115,9 @@ func IsLoggedIn() bool {
 }
 
 // apiDo is a helper that performs an authenticated HTTP request
-// and decodes the JSON response into v. The host should be the
-// API host (e.g. "api.flotio.ovh"), and path the API path (e.g. "/auth/me").
-func apiDo(method, host, path string, body io.Reader, v interface{}) error {
+// and decodes the JSON response into v. The baseURL should be a
+// full URL (e.g. "https://api.flotio.ovh"), and path the API path (e.g. "/auth/me").
+func apiDo(method, baseURL, path string, body io.Reader, v interface{}) error {
 	tokens, err := LoadTokens()
 	if err != nil {
 		return fmt.Errorf("loading tokens: %w", err)
@@ -123,7 +126,7 @@ func apiDo(method, host, path string, body io.Reader, v interface{}) error {
 		return fmt.Errorf("not logged in")
 	}
 
-	url := "https://" + host + path
+	url := baseURL + path
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
 		return fmt.Errorf("creating request: %w", err)
@@ -205,4 +208,13 @@ func ExtractList(data map[string]interface{}) ([]interface{}, error) {
 		}
 	}
 	return nil, fmt.Errorf("no list found in response")
+}
+
+// parseHost splits "scheme://host:port" into (scheme, host).
+func parseHost(raw string) (scheme, host string) {
+	idx := strings.Index(raw, "://")
+	if idx >= 0 {
+		return raw[:idx], raw[idx+3:]
+	}
+	return "https", raw
 }
