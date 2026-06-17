@@ -109,10 +109,14 @@ func Relogin(baseURL string) error {
 	if err != nil || tokens == nil || tokens.Email == "" {
 		return fmt.Errorf("no stored credentials")
 	}
+	return DoLogin(baseURL, tokens.Email, tokens.Password)
+}
 
+// DoLogin authenticates with email/password and saves tokens + credentials.
+func DoLogin(baseURL, email, password string) error {
 	body := map[string]string{
-		"email":    tokens.Email,
-		"password": tokens.Password,
+		"email":    email,
+		"password": password,
 	}
 	data, _ := json.Marshal(body)
 
@@ -130,7 +134,8 @@ func Relogin(baseURL string) error {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		return fmt.Errorf("login returned %d", resp.StatusCode)
+		errBody, _ := io.ReadAll(io.LimitReader(resp.Body, 4096))
+		return fmt.Errorf("login returned %d: %s", resp.StatusCode, string(errBody))
 	}
 
 	var result struct {
@@ -141,7 +146,7 @@ func Relogin(baseURL string) error {
 		return err
 	}
 
-	return SaveTokens(result.AccessToken, result.RefreshToken)
+	return SaveCredentials(email, password, result.AccessToken, result.RefreshToken)
 }
 
 // TokenPathFn returns the path to the auth token file.
