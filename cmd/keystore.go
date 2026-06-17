@@ -82,11 +82,16 @@ Requires the file path, key alias, and optionally store/key passwords.`,
 			"key_password":   keyPass,
 		}
 
-		var result map[string]interface{}
-		if err := client.PostJSON(cfg.ResolveHost(), "/keystore", body, &result); err != nil {
+		var wrapper map[string]interface{}
+		if err := client.PostJSON(cfg.ResolveHost(), "/keystore", body, &wrapper); err != nil {
 			return fmt.Errorf("creating keystore: %w", err)
 		}
-		fmt.Printf("✓ Keystore created: [%v] %v\n", result["id"], result["name"])
+		// API wraps response in {"keystore": {...}}
+		ks, ok := wrapper["keystore"].(map[string]interface{})
+		if !ok {
+			return fmt.Errorf("unexpected response format")
+		}
+		fmt.Printf("✓ Keystore created: [%v] %v\n", ks["id"], ks["name"])
 		return nil
 	},
 }

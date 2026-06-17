@@ -74,11 +74,16 @@ The file is stored securely and used during Android builds.`,
 			"name":        name,
 			"credentials": encoded,
 		}
-		var result map[string]interface{}
-		if err := client.PostJSON(cfg.ResolveHost(), "/google-play-credentials", body, &result); err != nil {
+		var wrapper map[string]interface{}
+		if err := client.PostJSON(cfg.ResolveHost(), "/google-play-credentials", body, &wrapper); err != nil {
 			return fmt.Errorf("creating credentials: %w", err)
 		}
-		fmt.Printf("✓ Play credentials created: [%v] %v\n", result["id"], result["name"])
+		// API wraps response in {"google_play_credentials": {...}}
+		creds, ok := wrapper["google_play_credentials"].(map[string]interface{})
+		if !ok {
+			return fmt.Errorf("unexpected response format")
+		}
+		fmt.Printf("✓ Play credentials created: [%v] %v\n", creds["id"], creds["name"])
 		return nil
 	},
 }

@@ -293,6 +293,19 @@ func DeleteJSON(host, path string) error {
 	return apiDo("DELETE", host, path, nil, nil)
 }
 
+// PutJSON performs an authenticated PUT with a JSON body, decoding the response into v.
+func PutJSON(host, path string, body, v interface{}) error {
+	var r io.Reader
+	if body != nil {
+		data, err := json.Marshal(body)
+		if err != nil {
+			return fmt.Errorf("marshaling request: %w", err)
+		}
+		r = bytes.NewReader(data)
+	}
+	return apiDo("PUT", host, path, r, v)
+}
+
 // ExtractList tries to find a JSON array in the response object.
 // Many Flotio API endpoints wrap lists in objects with keys like
 // "credentials", "keystores", "environments", etc.

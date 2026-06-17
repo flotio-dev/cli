@@ -183,11 +183,16 @@ func createProject(host, name, repo string) (int64, error) {
 	if repo != "" {
 		body["config"] = map[string]interface{}{"git_repo": repo}
 	}
-	var result map[string]interface{}
-	if err := client.PostJSON(host, "/project", body, &result); err != nil {
+	var wrapper map[string]interface{}
+	if err := client.PostJSON(host, "/project", body, &wrapper); err != nil {
 		return 0, err
 	}
-	pid, ok := result["id"].(float64)
+	// API wraps response in {"project": {"id": ..., "name": ...}}
+	p, ok := wrapper["project"].(map[string]interface{})
+	if !ok {
+		return 0, fmt.Errorf("unexpected response from project creation")
+	}
+	pid, ok := p["id"].(float64)
 	if !ok {
 		return 0, fmt.Errorf("unexpected response from project creation")
 	}
