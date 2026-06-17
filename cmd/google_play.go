@@ -49,7 +49,7 @@ var playListCmd = &cobra.Command{
 				continue
 			}
 			table.AddRow(
-				fmt.Sprintf("%v", c["id"]),
+				fmt.Sprintf("%v", c["ID"]),
 				fmt.Sprintf("%v", c["name"]),
 			)
 		}
@@ -92,7 +92,7 @@ The file is stored securely and used during Android builds.`,
 		if !ok {
 			return fmt.Errorf("unexpected response format")
 		}
-		display.SuccessPrint("Play credentials created: [%v] %v", creds["id"], creds["name"])
+		display.SuccessPrint("Play credentials created: [%v] %v", creds["ID"], creds["name"])
 		return nil
 	},
 }

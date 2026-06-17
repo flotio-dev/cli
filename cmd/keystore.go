@@ -50,7 +50,7 @@ var keystoreListCmd = &cobra.Command{
 				continue
 			}
 			table.AddRow(
-				fmt.Sprintf("%v", k["id"]),
+				fmt.Sprintf("%v", k["ID"]),
 				fmt.Sprintf("%v", k["name"]),
 				fmt.Sprintf("%v", k["key_alias"]),
 			)
@@ -102,7 +102,7 @@ Requires the file path, key alias, and optionally store/key passwords.`,
 		if !ok {
 			return fmt.Errorf("unexpected response format")
 		}
-		display.SuccessPrint("Keystore created: [%v] %v", ks["id"], ks["name"])
+		display.SuccessPrint("Keystore created: [%v] %v", ks["ID"], ks["name"])
 		return nil
 	},
 }

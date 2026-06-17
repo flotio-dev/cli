@@ -89,7 +89,7 @@ var envListCmd = &cobra.Command{
 			}
 			val := display.Truncate(fmt.Sprintf("%v", item["value"]), 40)
 			table.AddRow(
-				fmt.Sprintf("%v", item["id"]),
+				fmt.Sprintf("%v", item["ID"]),
 				fmt.Sprintf("%v", item["type"]),
 				fmt.Sprintf("%v", item["key"]),
 				val,
@@ -118,7 +118,7 @@ var envGetCmd = &cobra.Command{
 		if !ok {
 			return fmt.Errorf("unexpected response format")
 		}
-		display.HeadingPrint("Environment Asset %v", e["id"])
+		display.HeadingPrint("Environment Asset %v", e["ID"])
 		display.KeyValue("Key", "%v", e["key"])
 		display.KeyValue("Type", "%v", e["type"])
 		display.KeyValue("Value", "%v", e["value"])
@@ -186,7 +186,7 @@ var envCreateCmd = &cobra.Command{
 		if !ok {
 			return fmt.Errorf("unexpected response format")
 		}
-		display.SuccessPrint("Env created: [%v] %v", env["id"], env["key"])
+		display.SuccessPrint("Env created: [%v] %v", env["ID"], env["key"])
 		return nil
 	},
 }
