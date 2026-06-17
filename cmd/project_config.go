@@ -34,6 +34,10 @@ var configGetCmd = &cobra.Command{
 		if err := client.GetJSON(cfg.ResolveHost(), "/project/"+id+"/config", &result); err != nil {
 			return fmt.Errorf("getting config: %w", err)
 		}
+		if len(result) == 0 {
+			fmt.Println("No configuration set for this project.")
+			return nil
+		}
 		fmt.Printf("Git Repo:       %v\n", result["git_repo"])
 		fmt.Printf("Flutter:        %v\n", result["flutter_version"])
 		fmt.Printf("Platforms:      %v\n", result["platforms"])
