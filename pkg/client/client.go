@@ -19,10 +19,12 @@ import (
 // TokenFile is the path to the auth token storage, relative to ~/.flotio/.
 const TokenFile = "auth.json"
 
-// Tokens holds the persisted auth tokens.
+// Tokens holds the persisted auth tokens and credentials.
 type Tokens struct {
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
+	Email        string `json:"email,omitempty"`
+	Password     string `json:"password,omitempty"`
 }
 
 // LoadTokens reads tokens from ~/.flotio/auth.json.
@@ -47,7 +49,25 @@ func LoadTokens() (*Tokens, error) {
 }
 
 // SaveTokens persists tokens to ~/.flotio/auth.json.
+// If existing credentials (email/password) are stored, they are preserved.
 func SaveTokens(access, refresh string) error {
+	return saveAuth(func(t *Tokens) {
+		t.AccessToken = access
+		t.RefreshToken = refresh
+	})
+}
+
+// SaveCredentials persists email/password alongside tokens.
+func SaveCredentials(email, password, access, refresh string) error {
+	return saveAuth(func(t *Tokens) {
+		t.Email = email
+		t.Password = password
+		t.AccessToken = access
+		t.RefreshToken = refresh
+	})
+}
+
+func saveAuth(update func(*Tokens)) error {
 	path, err := tokenPath()
 	if err != nil {
 		return err
@@ -55,7 +75,14 @@ func SaveTokens(access, refresh string) error {
 	if err := os.MkdirAll(filepath.Dir(path), 0700); err != nil {
 		return fmt.Errorf("creating config dir: %w", err)
 	}
-	t := Tokens{AccessToken: access, RefreshToken: refresh}
+
+	// Preserve existing fields if they exist
+	t, _ := LoadTokens()
+	if t == nil {
+		t = &Tokens{}
+	}
+	update(t)
+
 	data, err := json.MarshalIndent(t, "", "  ")
 	if err != nil {
 		return err
@@ -73,6 +100,48 @@ func ClearTokens() error {
 		return err
 	}
 	return nil
+}
+
+// Relogin attempts to re-authenticate using stored credentials.
+// Returns nil on success (new tokens saved to auth.json).
+func Relogin(baseURL string) error {
+	tokens, err := LoadTokens()
+	if err != nil || tokens == nil || tokens.Email == "" {
+		return fmt.Errorf("no stored credentials")
+	}
+
+	body := map[string]string{
+		"email":    tokens.Email,
+		"password": tokens.Password,
+	}
+	data, _ := json.Marshal(body)
+
+	req, err := http.NewRequest("POST", baseURL+"/auth/login", bytes.NewReader(data))
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return fmt.Errorf("login returned %d", resp.StatusCode)
+	}
+
+	var result struct {
+		AccessToken  string `json:"access_token"`
+		RefreshToken string `json:"refresh_token"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return err
+	}
+
+	return SaveTokens(result.AccessToken, result.RefreshToken)
 }
 
 // TokenPathFn returns the path to the auth token file.
@@ -117,21 +186,30 @@ func IsLoggedIn() bool {
 // apiDo is a helper that performs an authenticated HTTP request
 // and decodes the JSON response into v. The baseURL should be a
 // full URL (e.g. "https://api.flotio.ovh"), and path the API path (e.g. "/auth/me").
+// On 401, automatically attempts re-login with stored credentials.
 func apiDo(method, baseURL, path string, body io.Reader, v interface{}) error {
 	tokens, err := LoadTokens()
 	if err != nil {
 		return fmt.Errorf("loading tokens: %w", err)
 	}
 	if tokens == nil || tokens.AccessToken == "" {
-		return fmt.Errorf("not logged in")
+		// Try re-login with stored credentials
+		if err := Relogin(baseURL); err != nil {
+			return fmt.Errorf("not logged in — run 'flotio login' first")
+		}
+		tokens, _ = LoadTokens()
 	}
 
+	return apiDoWithToken(method, baseURL, path, body, v, tokens.AccessToken)
+}
+
+func apiDoWithToken(method, baseURL, path string, body io.Reader, v interface{}, token string) error {
 	url := baseURL + path
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
 		return fmt.Errorf("creating request: %w", err)
 	}
-	req.Header.Set("Authorization", "Bearer "+tokens.AccessToken)
+	req.Header.Set("Authorization", "Bearer "+token)
 	req.Header.Set("Accept", "application/json")
 	if body != nil {
 		req.Header.Set("Content-Type", "application/json")
@@ -142,6 +220,18 @@ func apiDo(method, baseURL, path string, body io.Reader, v interface{}) error {
 		return fmt.Errorf("request failed: %w", err)
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode == 401 {
+		// Token expired — try re-login once, then retry
+		if err := Relogin(baseURL); err != nil {
+			errBody, _ := io.ReadAll(io.LimitReader(resp.Body, 4096))
+			return fmt.Errorf("API returned 401 (and re-login failed: %v): %s", err, string(errBody))
+		}
+		tokens, _ := LoadTokens()
+		if tokens != nil && tokens.AccessToken != "" && tokens.AccessToken != token {
+			return apiDoWithToken(method, baseURL, path, body, v, tokens.AccessToken)
+		}
+	}
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		errBody, _ := io.ReadAll(io.LimitReader(resp.Body, 4096))
