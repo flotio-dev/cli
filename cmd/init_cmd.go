@@ -9,6 +9,7 @@ import (
 
 	"github.com/flotio-dev/cli/internal/config"
 	"github.com/flotio-dev/cli/pkg/client"
+	"github.com/flotio-dev/cli/pkg/display"
 	"github.com/spf13/cobra"
 )
 
@@ -197,7 +198,7 @@ func createProject(host, name, repo string) (int64, error) {
 		return 0, fmt.Errorf("unexpected response from project creation")
 	}
 	id := int64(pid)
-	fmt.Printf("✓ Project created: [%d] %s\n", id, name)
+	display.SuccessPrint("Project created: [%d] %s", id, name)
 	return id, nil
 }
 

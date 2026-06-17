@@ -5,6 +5,7 @@ import (
 
 	"github.com/flotio-dev/cli/pkg/api/client/auth"
 	"github.com/flotio-dev/cli/pkg/client"
+	"github.com/flotio-dev/cli/pkg/display"
 	"github.com/spf13/cobra"
 )
 
@@ -36,7 +37,7 @@ Tokens are stored in ~/.flotio/auth.json and used automatically by other command
 			return fmt.Errorf("saving tokens: %w", err)
 		}
 
-		fmt.Println("✓ Logged in successfully")
+		display.SuccessPrint("Logged in as %s", email)
 		return nil
 	},
 }
@@ -60,7 +61,7 @@ var logoutCmd = &cobra.Command{
 		if err := client.ClearTokens(); err != nil {
 			return fmt.Errorf("clearing tokens: %w", err)
 		}
-		fmt.Println("✓ Logged out")
+		display.SuccessPrint("Logged out")
 		return nil
 	},
 }
@@ -79,9 +80,10 @@ var whoamiCmd = &cobra.Command{
 			return fmt.Errorf("whoami failed: %w", err)
 		}
 
-		fmt.Printf("email:    %v\n", user["email"])
-		fmt.Printf("username: %v\n", user["username"])
-		fmt.Printf("id:       %v\n", user["id"])
+		display.HeadingPrint("Authenticated User")
+		display.KeyValue("ID", "%v", user["id"])
+		display.KeyValue("Email", "%v", user["email"])
+		display.KeyValue("Username", "%v", user["username"])
 		return nil
 	},
 }

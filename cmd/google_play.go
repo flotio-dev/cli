@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/flotio-dev/cli/pkg/client"
+	"github.com/flotio-dev/cli/pkg/display"
 	"github.com/spf13/cobra"
 )
 
@@ -33,16 +34,26 @@ var playListCmd = &cobra.Command{
 		}
 		items, _ := client.ExtractList(raw)
 		if len(items) == 0 {
-			fmt.Println("No credentials found.")
+			display.NoResults("Google Play credentials")
 			return nil
+		}
+		table := &display.Table{
+			Columns: []display.Column{
+				{Header: "ID", Width: 5, Align: 1},
+				{Header: "Name", Max: 40},
+			},
 		}
 		for _, raw := range items {
 			c, ok := raw.(map[string]interface{})
 			if !ok {
 				continue
 			}
-			fmt.Printf("  [%v] %v\n", c["id"], c["name"])
+			table.AddRow(
+				fmt.Sprintf("%v", c["id"]),
+				fmt.Sprintf("%v", c["name"]),
+			)
 		}
+		table.Render()
 		return nil
 	},
 }
@@ -68,22 +79,20 @@ The file is stored securely and used during Android builds.`,
 		if err != nil {
 			return fmt.Errorf("reading credentials file: %w", err)
 		}
-		encoded := base64.StdEncoding.EncodeToString(data)
 
 		body := map[string]interface{}{
 			"name":        name,
-			"credentials": encoded,
+			"credentials": base64.StdEncoding.EncodeToString(data),
 		}
 		var wrapper map[string]interface{}
 		if err := client.PostJSON(cfg.ResolveHost(), "/google-play-credentials", body, &wrapper); err != nil {
 			return fmt.Errorf("creating credentials: %w", err)
 		}
-		// API wraps response in {"google_play_credentials": {...}}
 		creds, ok := wrapper["google_play_credentials"].(map[string]interface{})
 		if !ok {
 			return fmt.Errorf("unexpected response format")
 		}
-		fmt.Printf("✓ Play credentials created: [%v] %v\n", creds["id"], creds["name"])
+		display.SuccessPrint("Play credentials created: [%v] %v", creds["id"], creds["name"])
 		return nil
 	},
 }
@@ -100,7 +109,7 @@ var playDeleteCmd = &cobra.Command{
 		if err := client.DeleteJSON(cfg.ResolveHost(), "/google-play-credentials/"+args[0]); err != nil {
 			return fmt.Errorf("deleting credentials: %w", err)
 		}
-		fmt.Printf("✓ Play credentials %s deleted\n", args[0])
+		display.SuccessPrint("Play credentials %s deleted", args[0])
 		return nil
 	},
 }

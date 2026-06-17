@@ -5,6 +5,7 @@ import (
 
 	"github.com/flotio-dev/cli/pkg/api/client/github"
 	"github.com/flotio-dev/cli/pkg/client"
+	"github.com/flotio-dev/cli/pkg/display"
 	"github.com/spf13/cobra"
 )
 
@@ -32,13 +33,24 @@ var githubReposCmd = &cobra.Command{
 			return fmt.Errorf("listing repos: %w", err)
 		}
 		list := resp.GetPayload()
-		for _, r := range list.Repositories {
-			visibility := "public"
-			if r.Private {
-				visibility = "private"
-			}
-			fmt.Printf("  %s (%s)\n", r.FullName, visibility)
+		if list == nil || len(list.Repositories) == 0 {
+			display.NoResults("repositories")
+			return nil
 		}
+		table := &display.Table{
+			Columns: []display.Column{
+				{Header: "Repository", Max: 45},
+				{Header: "Visibility", Width: 12},
+			},
+		}
+		for _, r := range list.Repositories {
+			vis := "public"
+			if r.Private {
+				vis = display.Yellow + "private" + display.Reset
+			}
+			table.AddRow(r.FullName, vis)
+		}
+		table.Render()
 		return nil
 	},
 }
@@ -57,13 +69,25 @@ var githubRepoCmd = &cobra.Command{
 			return fmt.Errorf("getting repo: %w", err)
 		}
 		tree := resp.GetPayload()
-		for _, item := range tree.Tree {
-			icon := "📁"
-			if item.Type != "dir" {
-				icon = "📄"
-			}
-			fmt.Printf("  %s %s (%s)\n", icon, item.Name, item.Path)
+		if tree == nil || len(tree.Tree) == 0 {
+			display.NoResults("files")
+			return nil
 		}
+		table := &display.Table{
+			Columns: []display.Column{
+				{Header: "Name", Max: 30},
+				{Header: "Path", Max: 40},
+				{Header: "Type", Width: 6},
+			},
+		}
+		for _, item := range tree.Tree {
+			icon := "📄"
+			if item.Type == "dir" {
+				icon = "📁"
+			}
+			table.AddRow(icon+" "+item.Name, item.Path, item.Type)
+		}
+		table.Render()
 		return nil
 	},
 }
@@ -85,7 +109,7 @@ var githubConnectCmd = &cobra.Command{
 		if err != nil {
 			return fmt.Errorf("connecting GitHub: %w", err)
 		}
-		fmt.Printf("✓ GitHub installation %d connected\n", instID)
+		display.SuccessPrint("GitHub installation %d connected", instID)
 		return nil
 	},
 }
@@ -101,7 +125,7 @@ var githubDisconnectCmd = &cobra.Command{
 		if err := client.DeleteJSON(cfg.ResolveHost(), "/github/disconnect"); err != nil {
 			return fmt.Errorf("disconnecting GitHub: %w", err)
 		}
-		fmt.Println("✓ GitHub disconnected")
+		display.SuccessPrint("GitHub disconnected")
 		return nil
 	},
 }
@@ -120,11 +144,12 @@ var githubStatusCmd = &cobra.Command{
 		}
 		inst := resp.GetPayload()
 		if inst.ID == 0 {
-			fmt.Println("No GitHub installation connected.")
+			display.NoResults("GitHub installation")
 			return nil
 		}
-		fmt.Printf("Installation ID: %d\n", inst.ID)
-		fmt.Printf("Account:         %s (%s)\n", inst.AccountLogin, inst.AccountType)
+		display.HeadingPrint("GitHub Installation")
+		display.KeyValue("Installation ID", "%d", inst.ID)
+		display.KeyValue("Account", "%s (%s)", inst.AccountLogin, inst.AccountType)
 		return nil
 	},
 }

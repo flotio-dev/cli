@@ -8,30 +8,22 @@ import (
 
 	"github.com/flotio-dev/cli/internal/config"
 	"github.com/flotio-dev/cli/pkg/client"
+	"github.com/flotio-dev/cli/pkg/display"
 	"github.com/spf13/cobra"
 )
 
 // resolveFileValue handles the @file syntax and base64 encoding for file uploads.
-// If value starts with "@", the referenced file is read and base64-encoded.
-// If assetType is "file", the value is always base64-encoded.
-// Returns the final value and whether it's base64-encoded.
 func resolveFileValue(value, assetType string) (string, bool, error) {
-	isFileRef := strings.HasPrefix(value, "@")
-	isFileType := assetType == "file"
-
-	if isFileRef {
-		filePath := value[1:]
-		data, err := os.ReadFile(filePath)
+	if strings.HasPrefix(value, "@") {
+		data, err := os.ReadFile(value[1:])
 		if err != nil {
-			return "", false, fmt.Errorf("reading file %s: %w", filePath, err)
+			return "", false, fmt.Errorf("reading file %s: %w", value[1:], err)
 		}
 		return base64.StdEncoding.EncodeToString(data), true, nil
 	}
-
-	if isFileType {
+	if assetType == "file" {
 		return base64.StdEncoding.EncodeToString([]byte(value)), true, nil
 	}
-
 	return value, false, nil
 }
 
@@ -41,7 +33,7 @@ var envCmd = &cobra.Command{
 	Long:  `Create, list, update, and delete environment assets (variables and files).`,
 	Example: `  flotio env list
   flotio env list --project 1
-  flotio env create DATABASE_URL "postgres://..." 
+  flotio env create DATABASE_URL "postgres://..."
   flotio env create .env.production @./.env.prod --type file --path .env
   flotio env update 1 --value "new-value"
   flotio env update 1 --value @./new-key.jks --type file
@@ -56,12 +48,9 @@ var envListCmd = &cobra.Command{
 		if !client.IsLoggedIn() {
 			return fmt.Errorf("not logged in")
 		}
-
-		// Build URL with optional project_id filter
 		url := "/env"
 		pid, _ := cmd.Flags().GetInt64("project")
 		if pid == 0 {
-			// Try .flotio.yaml
 			if id, err := config.ResolveProjectID(0); err == nil {
 				pid = id
 			}
@@ -76,21 +65,38 @@ var envListCmd = &cobra.Command{
 		}
 		items, _ := client.ExtractList(raw)
 		if len(items) == 0 {
-			fmt.Println("No environment assets found.")
+			display.NoResults("environment assets")
 			return nil
+		}
+
+		table := &display.Table{
+			Columns: []display.Column{
+				{Header: "ID", Width: 5, Align: 1},
+				{Header: "Type", Width: 6},
+				{Header: "Key", Max: 30},
+				{Header: "Value", Max: 40},
+				{Header: "Project", Width: 9},
+			},
 		}
 		for _, raw := range items {
 			item, ok := raw.(map[string]interface{})
 			if !ok {
 				continue
 			}
-			pid := item["project_id"]
-			if pid == nil {
-				pid = "-"
+			projectStr := "-"
+			if pid, ok := item["project_id"]; ok && pid != nil {
+				projectStr = fmt.Sprintf("%v", pid)
 			}
-			fmt.Printf("  [%v] %-6v %-25v = %v  (project: %v)\n",
-				item["id"], item["type"], item["key"], item["value"], pid)
+			val := display.Truncate(fmt.Sprintf("%v", item["value"]), 40)
+			table.AddRow(
+				fmt.Sprintf("%v", item["id"]),
+				fmt.Sprintf("%v", item["type"]),
+				fmt.Sprintf("%v", item["key"]),
+				val,
+				projectStr,
+			)
 		}
+		table.Render()
 		return nil
 	},
 }
@@ -108,20 +114,24 @@ var envGetCmd = &cobra.Command{
 		if err := client.GetJSON(cfg.ResolveHost(), "/env/"+args[0], &wrapper); err != nil {
 			return fmt.Errorf("getting env: %w", err)
 		}
-		// API wraps response in {"env": {...}}
 		e, ok := wrapper["env"].(map[string]interface{})
 		if !ok {
 			return fmt.Errorf("unexpected response format")
 		}
-		fmt.Printf("Key:       %v\n", e["key"])
-		fmt.Printf("Type:      %v\n", e["type"])
-		fmt.Printf("Value:     %v\n", e["value"])
-		fmt.Printf("Project:   %v\n", e["project_id"])
+		display.HeadingPrint("Environment Asset %v", e["id"])
+		display.KeyValue("Key", "%v", e["key"])
+		display.KeyValue("Type", "%v", e["type"])
+		display.KeyValue("Value", "%v", e["value"])
+		if pid := e["project_id"]; pid != nil {
+			display.KeyValue("Project", "%v", pid)
+		} else {
+			display.KeyValue("Project", "-")
+		}
 		if p, ok := e["path"]; ok && p != nil && p != "" {
-			fmt.Printf("Path:      %v\n", p)
+			display.KeyValue("Path", "%v", p)
 		}
 		if b, ok := e["is_base64"]; ok && b != nil && b != false {
-			fmt.Println("Encoding:  base64")
+			display.KeyValue("Encoding", "base64")
 		}
 		return nil
 	},
@@ -144,14 +154,12 @@ var envCreateCmd = &cobra.Command{
 		if assetType == "" {
 			assetType = "env"
 		}
-		// Auto-resolve project from .flotio.yaml if not explicitly passed
 		if projectID == 0 {
 			if id, err := config.ResolveProjectID(0); err == nil {
 				projectID = id
 			}
 		}
 
-		// Resolve @file syntax and base64-encode files
 		value, isBase64, err := resolveFileValue(rawValue, assetType)
 		if err != nil {
 			return err
@@ -174,12 +182,11 @@ var envCreateCmd = &cobra.Command{
 		if err := client.PostJSON(cfg.ResolveHost(), "/env", body, &wrapper); err != nil {
 			return fmt.Errorf("creating env: %w", err)
 		}
-		// API wraps response in {"env": {...}}
 		env, ok := wrapper["env"].(map[string]interface{})
 		if !ok {
 			return fmt.Errorf("unexpected response format")
 		}
-		fmt.Printf("✓ Env created: [%v] %v\n", env["id"], env["key"])
+		display.SuccessPrint("Env created: [%v] %v", env["id"], env["key"])
 		return nil
 	},
 }
@@ -204,7 +211,6 @@ var envUpdateCmd = &cobra.Command{
 			return fmt.Errorf("at least one of --value, --key, --type, --path, --base64 is required")
 		}
 
-		// Fetch current env to preserve all fields (API overwrites everything)
 		var wrapper map[string]interface{}
 		if err := client.GetJSON(cfg.ResolveHost(), "/env/"+args[0], &wrapper); err != nil {
 			return fmt.Errorf("fetching current env: %w", err)
@@ -214,13 +220,11 @@ var envUpdateCmd = &cobra.Command{
 			return fmt.Errorf("unexpected response format when fetching env")
 		}
 
-		// Determine effective type for base64 decision
 		effectiveType := fmt.Sprint(current["type"])
 		if newType != "" {
 			effectiveType = newType
 		}
 
-		// Build full update body, preserving existing values
 		body := map[string]interface{}{
 			"key":       current["key"],
 			"value":     current["value"],
@@ -235,7 +239,6 @@ var envUpdateCmd = &cobra.Command{
 			body["key"] = newKey
 		}
 		if newValue != "" {
-			// Resolve @file syntax and base64-encode files
 			resolved, isB64, err := resolveFileValue(newValue, effectiveType)
 			if err != nil {
 				return err
@@ -245,7 +248,6 @@ var envUpdateCmd = &cobra.Command{
 		}
 		if newType != "" {
 			body["type"] = newType
-			// If switching to file type, re-encode existing value as base64
 			if newType == "file" && newValue == "" {
 				if v, ok := current["value"].(string); ok {
 					body["value"] = base64.StdEncoding.EncodeToString([]byte(v))
@@ -263,7 +265,7 @@ var envUpdateCmd = &cobra.Command{
 		if err := client.PutJSON(cfg.ResolveHost(), "/env/"+args[0], body, nil); err != nil {
 			return fmt.Errorf("updating env: %w", err)
 		}
-		fmt.Printf("✓ Env %s updated\n", args[0])
+		display.SuccessPrint("Env %s updated", args[0])
 		return nil
 	},
 }
@@ -280,7 +282,7 @@ var envDeleteCmd = &cobra.Command{
 		if err := client.DeleteJSON(cfg.ResolveHost(), "/env/"+args[0]); err != nil {
 			return fmt.Errorf("deleting env: %w", err)
 		}
-		fmt.Printf("✓ Env %s deleted\n", args[0])
+		display.SuccessPrint("Env %s deleted", args[0])
 		return nil
 	},
 }

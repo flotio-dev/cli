@@ -6,6 +6,7 @@ import (
 
 	"github.com/flotio-dev/cli/pkg/api/client/projects"
 	"github.com/flotio-dev/cli/pkg/client"
+	"github.com/flotio-dev/cli/pkg/display"
 	"github.com/spf13/cobra"
 )
 
@@ -33,13 +34,29 @@ var projectListCmd = &cobra.Command{
 			return fmt.Errorf("listing projects: %w", err)
 		}
 		list := resp.GetPayload()
-		if list == nil || list.Projects == nil {
-			fmt.Println("No projects found.")
+		if list == nil || list.Projects == nil || len(list.Projects) == 0 {
+			display.NoResults("projects")
 			return nil
 		}
-		for _, p := range list.Projects {
-			fmt.Printf("  [%d] %s\n", p.ID, p.Name)
+		table := &display.Table{
+			Columns: []display.Column{
+				{Header: "ID", Width: 5, Align: 1},
+				{Header: "Name", Max: 35},
+				{Header: "Platforms", Max: 25},
+			},
 		}
+		for _, p := range list.Projects {
+			platforms := "-"
+			if p.Config != nil && len(p.Config.Platforms) > 0 {
+				platforms = strings.Join(p.Config.Platforms, ", ")
+			}
+			table.AddRow(
+				fmt.Sprintf("%d", p.ID),
+				p.Name,
+				platforms,
+			)
+		}
+		table.Render()
 		return nil
 	},
 }
@@ -67,11 +84,19 @@ var projectGetCmd = &cobra.Command{
 			return fmt.Errorf("getting project: %w", err)
 		}
 		p := resp.GetPayload().Project
-		fmt.Printf("ID:        %d\n", p.ID)
-		fmt.Printf("Name:      %s\n", p.Name)
-		fmt.Printf("User ID:   %d\n", p.UserID)
-		fmt.Printf("Created:   %s\n", p.CreatedAt)
-		fmt.Printf("Updated:   %s\n", p.UpdatedAt)
+		display.HeadingPrint("Project %d", p.ID)
+		display.KeyValue("Name", "%s", p.Name)
+		display.KeyValue("User ID", "%d", p.UserID)
+		display.KeyValue("Created", "%s", p.CreatedAt)
+		display.KeyValue("Updated", "%s", p.UpdatedAt)
+		if p.Config != nil {
+			if p.Config.GitRepo != "" {
+				display.KeyValue("Git Repo", "%s", p.Config.GitRepo)
+			}
+			if len(p.Config.Platforms) > 0 {
+				display.KeyValue("Platforms", "%s", strings.Join(p.Config.Platforms, ", "))
+			}
+		}
 		return nil
 	},
 }
@@ -103,7 +128,7 @@ var projectCreateCmd = &cobra.Command{
 			return fmt.Errorf("creating project: %w", err)
 		}
 		p := resp.GetPayload().Project
-		fmt.Printf("✓ Project created: [%d] %s\n", p.ID, p.Name)
+		display.SuccessPrint("Project created: [%d] %s", p.ID, p.Name)
 		return nil
 	},
 }
@@ -141,7 +166,7 @@ var projectUpdateCmd = &cobra.Command{
 		if err != nil {
 			return fmt.Errorf("updating project: %w", err)
 		}
-		fmt.Printf("✓ Project %d updated\n", id)
+		display.SuccessPrint("Project %d updated", id)
 		return nil
 	},
 }
@@ -168,7 +193,7 @@ var projectDeleteCmd = &cobra.Command{
 		if err != nil {
 			return fmt.Errorf("deleting project: %w", err)
 		}
-		fmt.Printf("✓ Project %d deleted\n", id)
+		display.SuccessPrint("Project %d deleted", id)
 		return nil
 	},
 }

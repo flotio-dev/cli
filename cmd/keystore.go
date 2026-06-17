@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/flotio-dev/cli/pkg/client"
+	"github.com/flotio-dev/cli/pkg/display"
 	"github.com/spf13/cobra"
 )
 
@@ -33,16 +34,28 @@ var keystoreListCmd = &cobra.Command{
 		}
 		items, _ := client.ExtractList(raw)
 		if len(items) == 0 {
-			fmt.Println("No keystores found.")
+			display.NoResults("keystores")
 			return nil
+		}
+		table := &display.Table{
+			Columns: []display.Column{
+				{Header: "ID", Width: 5, Align: 1},
+				{Header: "Name", Max: 30},
+				{Header: "Alias", Max: 20},
+			},
 		}
 		for _, raw := range items {
 			k, ok := raw.(map[string]interface{})
 			if !ok {
 				continue
 			}
-			fmt.Printf("  [%v] %v (alias: %v)\n", k["id"], k["name"], k["key_alias"])
+			table.AddRow(
+				fmt.Sprintf("%v", k["id"]),
+				fmt.Sprintf("%v", k["name"]),
+				fmt.Sprintf("%v", k["key_alias"]),
+			)
 		}
+		table.Render()
 		return nil
 	},
 }
@@ -72,11 +85,10 @@ Requires the file path, key alias, and optionally store/key passwords.`,
 		if err != nil {
 			return fmt.Errorf("reading keystore file: %w", err)
 		}
-		encoded := base64.StdEncoding.EncodeToString(data)
 
 		body := map[string]interface{}{
 			"name":           name,
-			"keystore_file":  encoded,
+			"keystore_file":  base64.StdEncoding.EncodeToString(data),
 			"key_alias":      alias,
 			"store_password": storePass,
 			"key_password":   keyPass,
@@ -86,12 +98,11 @@ Requires the file path, key alias, and optionally store/key passwords.`,
 		if err := client.PostJSON(cfg.ResolveHost(), "/keystore", body, &wrapper); err != nil {
 			return fmt.Errorf("creating keystore: %w", err)
 		}
-		// API wraps response in {"keystore": {...}}
 		ks, ok := wrapper["keystore"].(map[string]interface{})
 		if !ok {
 			return fmt.Errorf("unexpected response format")
 		}
-		fmt.Printf("✓ Keystore created: [%v] %v\n", ks["id"], ks["name"])
+		display.SuccessPrint("Keystore created: [%v] %v", ks["id"], ks["name"])
 		return nil
 	},
 }
@@ -108,7 +119,7 @@ var keystoreDeleteCmd = &cobra.Command{
 		if err := client.DeleteJSON(cfg.ResolveHost(), "/keystore/"+args[0]); err != nil {
 			return fmt.Errorf("deleting keystore: %w", err)
 		}
-		fmt.Printf("✓ Keystore %s deleted\n", args[0])
+		display.SuccessPrint("Keystore %s deleted", args[0])
 		return nil
 	},
 }

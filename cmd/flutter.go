@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/flotio-dev/cli/pkg/api/client/flutter"
+	"github.com/flotio-dev/cli/pkg/display"
 	"github.com/spf13/cobra"
 )
 
@@ -24,9 +25,20 @@ var flutterVersionsCmd = &cobra.Command{
 			return fmt.Errorf("getting Flutter versions: %w", err)
 		}
 		list := resp.GetPayload()
-		for _, v := range list.Versions {
-			fmt.Printf("  %-8s %s\n", v.Channel, v.Version)
+		if list == nil || len(list.Versions) == 0 {
+			display.NoResults("Flutter versions")
+			return nil
 		}
+		table := &display.Table{
+			Columns: []display.Column{
+				{Header: "Channel", Width: 8},
+				{Header: "Version", Width: 12},
+			},
+		}
+		for _, v := range list.Versions {
+			table.AddRow(v.Channel, v.Version)
+		}
+		table.Render()
 		return nil
 	},
 }

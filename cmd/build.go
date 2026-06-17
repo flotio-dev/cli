@@ -6,6 +6,7 @@ import (
 
 	"github.com/flotio-dev/cli/pkg/api/client/builds"
 	"github.com/flotio-dev/cli/pkg/client"
+	"github.com/flotio-dev/cli/pkg/display"
 	"github.com/spf13/cobra"
 )
 
@@ -57,7 +58,7 @@ var buildStartCmd = &cobra.Command{
 			return fmt.Errorf("starting build: %w", err)
 		}
 		b := resp.GetPayload().Build
-		fmt.Printf("✓ Build started: [%d] %s\n", b.ID, b.Status)
+		display.SuccessPrint("Build started: [%d] %s | %s | %s", b.ID, display.StatusBadge(b.Status), b.Platform, b.GitBranch)
 		return nil
 	},
 }
@@ -86,13 +87,33 @@ var buildListCmd = &cobra.Command{
 			return fmt.Errorf("listing builds: %w", err)
 		}
 		list := resp.GetPayload()
-		if list == nil || list.Builds == nil {
-			fmt.Println("No builds found.")
+		if list == nil || list.Builds == nil || len(list.Builds) == 0 {
+			display.NoResults("builds")
 			return nil
 		}
-		for _, b := range list.Builds {
-			fmt.Printf("  [%d] %s | %s | %s\n", b.ID, b.Status, b.Platform, b.GitBranch)
+		table := &display.Table{
+			Columns: []display.Column{
+				{Header: "ID", Width: 5, Align: 1},
+				{Header: "Status", Width: 12},
+				{Header: "Platform", Width: 10},
+				{Header: "Branch", Max: 20},
+				{Header: "Duration", Width: 10},
+			},
 		}
+		for _, b := range list.Builds {
+			dur := "-"
+			if b.Duration > 0 {
+				dur = fmt.Sprintf("%ds", b.Duration)
+			}
+			table.AddRow(
+				fmt.Sprintf("%d", b.ID),
+				display.StatusBadge(b.Status),
+				b.Platform,
+				b.GitBranch,
+				dur,
+			)
+		}
+		table.Render()
 		return nil
 	},
 }
@@ -132,7 +153,7 @@ var buildLogsCmd = &cobra.Command{
 			fmt.Println(line)
 		}
 		if payload.HasMore {
-			fmt.Println("(more logs available)")
+			fmt.Println(display.Muted + "(more logs available)" + display.Reset)
 		}
 		return nil
 	},
@@ -168,7 +189,7 @@ var buildCancelCmd = &cobra.Command{
 		if err != nil {
 			return fmt.Errorf("cancelling build: %w", err)
 		}
-		fmt.Printf("✓ Build %d cancelled\n", buildID)
+		display.SuccessPrint("Build %d cancelled", buildID)
 		return nil
 	},
 }
@@ -204,8 +225,9 @@ var buildDownloadCmd = &cobra.Command{
 			return fmt.Errorf("getting download URL: %w", err)
 		}
 		payload := resp.GetPayload()
-		fmt.Printf("Download URL: %s\n", payload.DownloadURL)
-		fmt.Printf("Expires in:  %d seconds\n", payload.ExpiresIn)
+		display.HeadingPrint("Build %d Artifact", buildID)
+		display.KeyValue("Download URL", "%s", payload.DownloadURL)
+		display.KeyValue("Expires in", "%ds", payload.ExpiresIn)
 		return nil
 	},
 }
@@ -240,7 +262,7 @@ var buildDeleteCmd = &cobra.Command{
 		if err != nil {
 			return fmt.Errorf("deleting build: %w", err)
 		}
-		fmt.Printf("✓ Build %d deleted\n", buildID)
+		display.SuccessPrint("Build %d deleted", buildID)
 		return nil
 	},
 }
