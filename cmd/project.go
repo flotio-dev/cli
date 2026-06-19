@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/flotio-dev/cli/pkg/api/client/projects"
@@ -105,20 +106,19 @@ var projectCreateCmd = &cobra.Command{
 	Use:   "create <name>",
 	Short: "Create a new project",
 	Args:  cobra.ExactArgs(1),
+	Example: `  flotio project create "My App" --repo https://github.com/user/repo --platform android
+  flotio project create "My App" --repo <url> --flutter-version 3.22.0 --build-mode release \
+    --android-format aab --play-track production`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if !client.IsLoggedIn() {
 			return fmt.Errorf("not logged in")
 		}
-		name := args[0]
-		gitRepo, _ := cmd.Flags().GetString("repo")
-		platforms, _ := cmd.Flags().GetStringSlice("platform")
-
-		body := &ProjectCreateReq{Name: name}
-		if gitRepo != "" || len(platforms) > 0 {
-			cfg := &ProjectConfig{GitRepo: gitRepo}
-			if len(platforms) > 0 {
-				cfg.Platforms = flattenPlatforms(platforms)
-			}
+		body := &ProjectCreateReq{Name: args[0]}
+		cfg, err := configFromFlags(cmd)
+		if err != nil {
+			return err
+		}
+		if cfg != nil {
 			body.Config = cfg
 		}
 
@@ -135,9 +135,11 @@ var projectCreateCmd = &cobra.Command{
 
 var projectUpdateCmd = &cobra.Command{
 	Use:     "update [id]",
-	Short:   "Update a project",
+	Short:   "Update a project (name and/or config flags)",
 	Args:    cobra.MaximumNArgs(1),
-	Example: `  flotio project update --name "New Name"`,
+	Example: `  flotio project update 3 --name "New Name"
+  flotio project update 3 --flutter-version 3.22.0 --build-mode release
+  flotio project update --repo https://github.com/user/repo   # uses project-id from config`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if !client.IsLoggedIn() {
 			return fmt.Errorf("not logged in")
@@ -151,14 +153,17 @@ var projectUpdateCmd = &cobra.Command{
 			return err
 		}
 		name, _ := cmd.Flags().GetString("name")
-		if name == "" {
-			return fmt.Errorf("--name is required for update")
+		cfg, err := configFromFlags(cmd)
+		if err != nil {
+			return err
 		}
-		gitRepo, _ := cmd.Flags().GetString("repo")
+		if name == "" && cfg == nil {
+			return fmt.Errorf("nothing to update — pass --name or at least one config flag (--repo, --flutter-version, ...)")
+		}
 
 		body := &ProjectUpdateReq{Name: name}
-		if gitRepo != "" {
-			body.Config = &ProjectConfig{GitRepo: gitRepo}
+		if cfg != nil {
+			body.Config = cfg
 		}
 
 		params := projects.NewPutProjectIDParams().WithID(id).WithProject(body)
@@ -211,11 +216,92 @@ func flattenPlatforms(raw []string) []string {
 	return out
 }
 
+// addProjectConfigFlags registers the shared project-config flags on a command.
+// Used by both `project create` and `project update` so they expose the same
+// surface and stay in sync.
+func addProjectConfigFlags(cmd *cobra.Command) {
+	cmd.Flags().String("repo", "", "Git repository URL")
+	cmd.Flags().String("git-username", "", "Git username for private repos")
+	cmd.Flags().String("git-token", "", "Git token/password for private repos (use @file to read from a file)")
+	cmd.Flags().StringSlice("platform", nil, "Target platforms (android, ios, web)")
+	cmd.Flags().String("flutter-version", "", "Flutter SDK version (e.g. 3.22.0)")
+	cmd.Flags().String("build-mode", "", "Build mode: debug, release, or profile")
+	cmd.Flags().String("project-path", "", "Path to the Flutter project inside the repo")
+	cmd.Flags().String("android-format", "", "Android build format: apk or aab")
+	cmd.Flags().String("play-track", "", "Google Play track: internal, alpha, beta, or production")
+}
+
+// resolveSecret handles the @file syntax for secret flags (e.g. --git-token @./pat).
+// A leading "@" reads the file content (trimmed of surrounding whitespace).
+// Otherwise the value is returned as-is.
+func resolveSecret(v string) (string, error) {
+	if !strings.HasPrefix(v, "@") {
+		return v, nil
+	}
+	data, err := os.ReadFile(strings.TrimPrefix(v, "@"))
+	if err != nil {
+		return "", fmt.Errorf("reading secret file: %w", err)
+	}
+	return strings.TrimSpace(string(data)), nil
+}
+
+// configFromFlags builds a *ProjectConfig from the shared config flags.
+// Returns nil when no config flag was set, so callers can omit the config block.
+func configFromFlags(cmd *cobra.Command) (*ProjectConfig, error) {
+	var cfg ProjectConfig
+	any := false
+
+	if v, _ := cmd.Flags().GetString("repo"); v != "" {
+		cfg.GitRepo = v
+		any = true
+	}
+	if v, _ := cmd.Flags().GetString("git-username"); v != "" {
+		cfg.GitUsername = v
+		any = true
+	}
+	if v, _ := cmd.Flags().GetString("git-token"); v != "" {
+		secret, err := resolveSecret(v)
+		if err != nil {
+			return nil, err
+		}
+		cfg.GitToken = secret
+		any = true
+	}
+	if v, _ := cmd.Flags().GetStringSlice("platform"); len(v) > 0 {
+		cfg.Platforms = flattenPlatforms(v)
+		any = true
+	}
+	if v, _ := cmd.Flags().GetString("flutter-version"); v != "" {
+		cfg.FlutterVersion = v
+		any = true
+	}
+	if v, _ := cmd.Flags().GetString("build-mode"); v != "" {
+		cfg.BuildMode = v
+		any = true
+	}
+	if v, _ := cmd.Flags().GetString("project-path"); v != "" {
+		cfg.ProjectPath = v
+		any = true
+	}
+	if v, _ := cmd.Flags().GetString("android-format"); v != "" {
+		cfg.AndroidBuildFormat = v
+		any = true
+	}
+	if v, _ := cmd.Flags().GetString("play-track"); v != "" {
+		cfg.GooglePlayTrack = v
+		any = true
+	}
+
+	if !any {
+		return nil, nil
+	}
+	return &cfg, nil
+}
+
 func init() {
-	projectCreateCmd.Flags().String("repo", "", "Git repository URL")
-	projectCreateCmd.Flags().StringSlice("platform", nil, "Platforms (android, ios, web)")
+	addProjectConfigFlags(projectCreateCmd)
 	projectUpdateCmd.Flags().String("name", "", "New project name")
-	projectUpdateCmd.Flags().String("repo", "", "Git repository URL")
+	addProjectConfigFlags(projectUpdateCmd)
 
 	projectCmd.AddCommand(projectListCmd)
 	projectCmd.AddCommand(projectGetCmd)
