@@ -190,7 +190,7 @@ func IsLoggedIn() bool {
 
 // apiDo is a helper that performs an authenticated HTTP request
 // and decodes the JSON response into v. The baseURL should be a
-// full URL (e.g. "https://api.flotio.ovh"), and path the API path (e.g. "/auth/me").
+//	full URL (e.g. "https://api.flotio.ovh"), and path the API path (e.g. "/auth/@me").
 // On 401, automatically attempts re-login with stored credentials.
 func apiDo(method, baseURL, path string, body io.Reader, v interface{}) error {
 	tokens, err := LoadTokens()
@@ -261,10 +261,10 @@ func (e *APIError) Error() string {
 	return fmt.Sprintf("API returned %d: %s", e.Code, e.Body)
 }
 
-// WhoAmI fetches the current user info from GET /auth/me.
+// WhoAmI fetches the current user info from GET /auth/@me.
 func WhoAmI(host string) (map[string]interface{}, error) {
 	var user map[string]interface{}
-	if err := apiDo("GET", host, "/auth/me", nil, &user); err != nil {
+	if err := apiDo("GET", host, "/auth/@me", nil, &user); err != nil {
 		return nil, err
 	}
 	return user, nil
