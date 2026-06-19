@@ -52,7 +52,7 @@ The --host flag sets the default API host (accepts scheme://host).`,
 
 		os.MkdirAll(dir, 0700)
 		out, _ := yaml.Marshal(current)
-		if err := os.WriteFile(path, out, 0644); err != nil {
+		if err := os.WriteFile(path, out, 0600); err != nil {
 			return fmt.Errorf("writing config: %w", err)
 		}
 		fmt.Printf("  Config saved to %s\n", path)

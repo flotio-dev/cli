@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	apiclient "github.com/flotio-dev/cli/pkg/api/client"
 	httptransport "github.com/go-openapi/runtime/client"
@@ -24,7 +25,6 @@ type Tokens struct {
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
 	Email        string `json:"email,omitempty"`
-	Password     string `json:"password,omitempty"`
 }
 
 // LoadTokens reads tokens from ~/.flotio/auth.json.
@@ -57,11 +57,12 @@ func SaveTokens(access, refresh string) error {
 	})
 }
 
-// SaveCredentials persists email/password alongside tokens.
-func SaveCredentials(email, password, access, refresh string) error {
+// SaveCredentials persists email alongside tokens.
+// The password is intentionally NOT stored — a refresh token is used for
+// silent re-authentication instead (see DoRefresh).
+func SaveCredentials(email, access, refresh string) error {
 	return saveAuth(func(t *Tokens) {
 		t.Email = email
-		t.Password = password
 		t.AccessToken = access
 		t.RefreshToken = refresh
 	})
@@ -102,14 +103,55 @@ func ClearTokens() error {
 	return nil
 }
 
-// Relogin attempts to re-authenticate using stored credentials.
-// Returns nil on success (new tokens saved to auth.json).
+// httpClient is the shared HTTP client with a sane timeout so a hung API
+// never blocks the CLI indefinitely.
+var httpClient = &http.Client{Timeout: 30 * time.Second}
+
+// Relogin attempts to silently refresh the access token using the stored
+// refresh token (rotation). Returns nil on success (new tokens saved).
+// The plaintext password is never persisted — refresh-token rotation replaces it.
 func Relogin(baseURL string) error {
 	tokens, err := LoadTokens()
-	if err != nil || tokens == nil || tokens.Email == "" {
-		return fmt.Errorf("no stored credentials")
+	if err != nil || tokens == nil || tokens.RefreshToken == "" {
+		return fmt.Errorf("no stored refresh token")
 	}
-	return DoLogin(baseURL, tokens.Email, tokens.Password)
+	return DoRefresh(baseURL, tokens.RefreshToken)
+}
+
+// DoRefresh exchanges a refresh token for a new access+refresh pair via
+// POST /auth/refresh (the token is sent as a cookie, as the API expects).
+func DoRefresh(baseURL, refreshToken string) error {
+	req, err := http.NewRequest("POST", baseURL+"/auth/refresh", nil)
+	if err != nil {
+		return err
+	}
+	req.AddCookie(&http.Cookie{Name: "refresh_token", Value: refreshToken})
+	req.Header.Set("Accept", "application/json")
+
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		errBody, _ := io.ReadAll(io.LimitReader(resp.Body, 4096))
+		return fmt.Errorf("refresh returned %d: %s", resp.StatusCode, string(errBody))
+	}
+
+	var result struct {
+		AccessToken  string `json:"access_token"`
+		RefreshToken string `json:"refresh_token"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return err
+	}
+
+	email := ""
+	if t, _ := LoadTokens(); t != nil {
+		email = t.Email
+	}
+	return SaveCredentials(email, result.AccessToken, result.RefreshToken)
 }
 
 // DoLogin authenticates with email/password and saves tokens + credentials.
@@ -127,7 +169,7 @@ func DoLogin(baseURL, email, password string) error {
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := httpClient.Do(req)
 	if err != nil {
 		return err
 	}
@@ -146,7 +188,7 @@ func DoLogin(baseURL, email, password string) error {
 		return err
 	}
 
-	return SaveCredentials(email, password, result.AccessToken, result.RefreshToken)
+	return SaveCredentials(email, result.AccessToken, result.RefreshToken)
 }
 
 // TokenPathFn returns the path to the auth token file.
@@ -220,17 +262,17 @@ func apiDoWithToken(method, baseURL, path string, body io.Reader, v interface{},
 		req.Header.Set("Content-Type", "application/json")
 	}
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := httpClient.Do(req)
 	if err != nil {
 		return fmt.Errorf("request failed: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 401 {
-		// Token expired — try re-login once, then retry
+		// Access token expired — try refresh-token rotation once, then retry.
 		if err := Relogin(baseURL); err != nil {
 			errBody, _ := io.ReadAll(io.LimitReader(resp.Body, 4096))
-			return fmt.Errorf("API returned 401 (and re-login failed: %v): %s", err, string(errBody))
+			return fmt.Errorf("session expired (refresh failed: %v): %s\n\nRun 'flotio login' again.", err, string(errBody))
 		}
 		tokens, _ := LoadTokens()
 		if tokens != nil && tokens.AccessToken != "" && tokens.AccessToken != token {

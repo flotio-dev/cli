@@ -64,6 +64,14 @@ var envListCmd = &cobra.Command{
 			return fmt.Errorf("listing env: %w", err)
 		}
 		items, _ := client.ExtractList(raw)
+		if display.JSONOutput() {
+			if len(items) == 0 {
+				fmt.Println("[]")
+			} else {
+				display.PrintJSON(items)
+			}
+			return nil
+		}
 		if len(items) == 0 {
 			display.NoResults("environment assets")
 			return nil
@@ -117,6 +125,10 @@ var envGetCmd = &cobra.Command{
 		e, ok := wrapper["env"].(map[string]interface{})
 		if !ok {
 			return fmt.Errorf("unexpected response format")
+		}
+		if display.JSONOutput() {
+			display.PrintJSON(e)
+			return nil
 		}
 		display.HeadingPrint("Environment Asset %v", e["ID"])
 		display.KeyValue("Key", "%v", e["key"])

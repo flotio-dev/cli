@@ -4,8 +4,9 @@ import (
 	"fmt"
 
 	"github.com/flotio-dev/cli/internal/config"
-	apiclient "github.com/flotio-dev/cli/pkg/api/client"
 	"github.com/flotio-dev/cli/pkg/client"
+	"github.com/flotio-dev/cli/pkg/display"
+	apiclient "github.com/flotio-dev/cli/pkg/api/client"
 	"github.com/spf13/cobra"
 )
 
@@ -54,6 +55,9 @@ Use "flotio <command> --help" for details on any command.`,
 		if err != nil {
 			return fmt.Errorf("failed to load configuration: %w", err)
 		}
+		// Propagate the --output flag to the display layer.
+		out, _ := cmd.Flags().GetString("output")
+		display.SetOutputFormat(out)
 		// Build the API client (auth is injected from stored tokens).
 		api = client.New(cfg.ResolveHost())
 		return nil
@@ -68,4 +72,5 @@ func Execute() error {
 func init() {
 	rootCmd.PersistentFlags().StringVar(&config.FlagConfigPath, "config", "", "path to config file (default: $HOME/.flotio/config.yaml)")
 	rootCmd.PersistentFlags().StringVar(&config.FlagHost, "host", "", "API host (default: api.flotio.ovh, accepts scheme://host e.g. http://localhost:8080)")
+	rootCmd.PersistentFlags().StringP("output", "o", "table", "Output format: table or json")
 }

@@ -87,6 +87,14 @@ var buildListCmd = &cobra.Command{
 			return fmt.Errorf("listing builds: %w", err)
 		}
 		list := resp.GetPayload()
+		if display.JSONOutput() {
+			if list != nil {
+				display.PrintJSON(list.Builds)
+			} else {
+				fmt.Println("[]")
+			}
+			return nil
+		}
 		if list == nil || list.Builds == nil || len(list.Builds) == 0 {
 			display.NoResults("builds")
 			return nil

@@ -65,7 +65,7 @@ With a project ID: skips interactive mode, uses that ID directly.`,
 		// 1. Auth
 		if !client.IsLoggedIn() {
 			fmt.Println("Not logged in. Let's authenticate first.")
-		fmt.Println()
+			fmt.Println()
 			email, password, err := promptLogin(r)
 			if err != nil {
 				return err

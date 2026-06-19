@@ -33,6 +33,14 @@ var playListCmd = &cobra.Command{
 			return fmt.Errorf("listing credentials: %w", err)
 		}
 		items, _ := client.ExtractList(raw)
+		if display.JSONOutput() {
+			if len(items) == 0 {
+				fmt.Println("[]")
+			} else {
+				display.PrintJSON(items)
+			}
+			return nil
+		}
 		if len(items) == 0 {
 			display.NoResults("Google Play credentials")
 			return nil

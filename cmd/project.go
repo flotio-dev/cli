@@ -35,6 +35,14 @@ var projectListCmd = &cobra.Command{
 			return fmt.Errorf("listing projects: %w", err)
 		}
 		list := resp.GetPayload()
+		if display.JSONOutput() {
+			if list != nil {
+				display.PrintJSON(list.Projects)
+			} else {
+				fmt.Println("[]")
+			}
+			return nil
+		}
 		if list == nil || list.Projects == nil || len(list.Projects) == 0 {
 			display.NoResults("projects")
 			return nil
@@ -85,6 +93,10 @@ var projectGetCmd = &cobra.Command{
 			return fmt.Errorf("getting project: %w", err)
 		}
 		p := resp.GetPayload().Project
+		if display.JSONOutput() {
+			display.PrintJSON(p)
+			return nil
+		}
 		display.HeadingPrint("Project %d", p.ID)
 		display.KeyValue("Name", "%s", p.Name)
 		display.KeyValue("User ID", "%d", p.UserID)

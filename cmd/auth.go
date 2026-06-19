@@ -33,7 +33,7 @@ Tokens are stored in ~/.flotio/auth.json and used automatically by other command
 		}
 
 		payload := resp.GetPayload()
-		if err := client.SaveCredentials(email, password, payload.AccessToken, payload.RefreshToken); err != nil {
+		if err := client.SaveCredentials(email, payload.AccessToken, payload.RefreshToken); err != nil {
 			return fmt.Errorf("saving tokens: %w", err)
 		}
 
