@@ -229,6 +229,7 @@ func addProjectConfigFlags(cmd *cobra.Command) {
 	cmd.Flags().String("project-path", "", "Path to the Flutter project inside the repo")
 	cmd.Flags().String("android-format", "", "Android build format: apk or aab")
 	cmd.Flags().String("play-track", "", "Google Play track: internal, alpha, beta, or production")
+	cmd.Flags().String("package-name", "", "Android applicationId (e.g. com.example.app)")
 }
 
 // resolveSecret handles the @file syntax for secret flags (e.g. --git-token @./pat).
@@ -289,6 +290,10 @@ func configFromFlags(cmd *cobra.Command) (*ProjectConfig, error) {
 	}
 	if v, _ := cmd.Flags().GetString("play-track"); v != "" {
 		cfg.GooglePlayTrack = v
+		any = true
+	}
+	if v, _ := cmd.Flags().GetString("package-name"); v != "" {
+		cfg.PackageName = v
 		any = true
 	}
 

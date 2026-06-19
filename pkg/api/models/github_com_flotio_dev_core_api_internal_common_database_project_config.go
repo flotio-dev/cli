@@ -114,6 +114,9 @@ type GithubComFlotioDevCoreAPIInternalCommonDatabaseProjectConfig struct {
 	// platforms
 	Platforms []string `json:"platforms"`
 
+	// package name
+	PackageName string `json:"package_name,omitempty"`
+
 	// post build script
 	PostBuildScript string `json:"post_build_script,omitempty"`
 
