@@ -3,6 +3,8 @@ package cmd
 import (
 	"fmt"
 	"strconv"
+	"strings"
+	"time"
 
 	"github.com/flotio-dev/cli/pkg/api/client/builds"
 	"github.com/flotio-dev/cli/pkg/client"
@@ -129,7 +131,8 @@ var buildListCmd = &cobra.Command{
 var buildLogsCmd = &cobra.Command{
 	Use:     "logs [project-id] <build-id>",
 	Short:   "Get build logs",
-	Example: `  flotio build logs 42`,
+	Example: `  flotio build logs 42
+  flotio build logs --watch 42`,
 	Args:    cobra.RangeArgs(1, 2),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if !client.IsLoggedIn() {
@@ -150,18 +153,21 @@ var buildLogsCmd = &cobra.Command{
 			return fmt.Errorf("invalid build ID: %s", buildArg)
 		}
 
-		params := builds.NewGetProjectIDBuildBuildIDLogsSyncParams().
+		watch, _ := cmd.Flags().GetBool("watch")
+		if watch {
+			return runBuildLogsWatch(projectID, buildID)
+		}
+
+		// One-shot: use the non-sync logs endpoint.
+		logParams := builds.NewGetProjectIDBuildBuildIDLogsParams().
 			WithID(projectID).WithBuildID(buildID)
-		resp, err := api.Builds.GetProjectIDBuildBuildIDLogsSync(params)
+		logResp, err := api.Builds.GetProjectIDBuildBuildIDLogs(logParams)
 		if err != nil {
 			return fmt.Errorf("getting logs: %w", err)
 		}
-		payload := resp.GetPayload()
+		payload := logResp.GetPayload()
 		for _, line := range payload.Logs {
 			fmt.Println(line)
-		}
-		if payload.HasMore {
-			fmt.Println(display.Muted + "(more logs available)" + display.Reset)
 		}
 		return nil
 	},
@@ -281,6 +287,8 @@ func init() {
 	buildStartCmd.Flags().String("mode", "", "Build mode (debug, release, profile)")
 	buildStartCmd.Flags().String("target", "", "Build target (apk, aab)")
 
+	buildLogsCmd.Flags().BoolP("watch", "w", false, "Watch logs in real-time (HTTP polling)")
+
 	buildCmd.AddCommand(buildStartCmd)
 	buildCmd.AddCommand(buildListCmd)
 	buildCmd.AddCommand(buildLogsCmd)
@@ -288,4 +296,76 @@ func init() {
 	buildCmd.AddCommand(buildDownloadCmd)
 	buildCmd.AddCommand(buildDeleteCmd)
 	rootCmd.AddCommand(buildCmd)
+}
+
+// runBuildLogsWatch polls the logs/sync endpoint continuously,
+// printing new lines as they arrive until the build finishes.
+func runBuildLogsWatch(projectID, buildID int64) error {
+	connectionID := fmt.Sprintf("flotio-cli-%d", time.Now().UnixNano())
+	lastLine := int64(0)
+	pollInterval := 2 * time.Second
+	pollTimeout := 15 * time.Second
+
+	fmt.Printf("%sWatching logs for build %d (project %d)...%s\n", display.Bold, buildID, projectID, display.Reset)
+	fmt.Printf("  %sPress Ctrl+C to stop.%s\n\n", display.Muted, display.Reset)
+
+	for {
+		ll := lastLine
+		params := builds.NewGetProjectIDBuildBuildIDLogsSyncParams().
+			WithID(projectID).
+			WithBuildID(buildID).
+			WithConnectionID(connectionID).
+			WithLastLine(&ll).
+			WithTimeout(pollTimeout)
+
+		resp, err := api.Builds.GetProjectIDBuildBuildIDLogsSync(params)
+		if err != nil {
+			errStr := err.Error()
+			// 404 typically means the build no longer exists (finished/cleaned up).
+			if strings.Contains(errStr, "404") || strings.Contains(errStr, "not found") {
+				fmt.Printf("\n%sBuild %d finished (no longer available).%s\n", display.Muted, buildID, display.Reset)
+				return nil
+			}
+			if strings.Contains(errStr, "400") {
+				// 400 may mean the build isn't in a running state.
+				fmt.Printf("\n%sBuild %d is not running.%s\n", display.Muted, buildID, display.Reset)
+				return nil
+			}
+			return fmt.Errorf("watching logs: %w", err)
+		}
+
+		payload := resp.GetPayload()
+
+		// Print new log lines.
+		for _, line := range payload.Logs {
+			fmt.Println(line)
+		}
+
+		// Update cursor for next poll.
+		if payload.LastLine > lastLine {
+			lastLine = payload.LastLine
+		}
+
+		// Check if the build has reached a terminal state.
+		status := strings.ToLower(payload.Status)
+		if !payload.HasMore && isTerminalStatus(status) {
+			fmt.Printf("\n%s── Build %s ──%s\n", display.Bold, display.StatusBadge(status), display.Reset)
+			if payload.ElapsedTime > 0 {
+				fmt.Printf("  %sDuration: %ds%s\n", display.Muted, payload.ElapsedTime, display.Reset)
+			}
+			return nil
+		}
+
+		// Wait before next poll (API already did long-poll, but add a small
+		// backoff to avoid hammering when no new logs are available).
+		time.Sleep(pollInterval)
+	}
+}
+
+func isTerminalStatus(status string) bool {
+	switch status {
+	case "succeeded", "success", "failed", "error", "cancelled", "canceled", "timeout":
+		return true
+	}
+	return false
 }
