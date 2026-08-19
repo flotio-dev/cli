@@ -74,7 +74,7 @@ With a project ID: skips interactive mode, uses that ID directly.`,
 				return fmt.Errorf("login failed: %w", err)
 			}
 			fmt.Println("✓ Logged in")
-		fmt.Println()
+			fmt.Println()
 		} else {
 			fmt.Println("✓ Already authenticated")
 			fmt.Println()

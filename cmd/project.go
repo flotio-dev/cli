@@ -146,9 +146,9 @@ var projectCreateCmd = &cobra.Command{
 }
 
 var projectUpdateCmd = &cobra.Command{
-	Use:     "update [id]",
-	Short:   "Update a project (name and/or config flags)",
-	Args:    cobra.MaximumNArgs(1),
+	Use:   "update [id]",
+	Short: "Update a project (name and/or config flags)",
+	Args:  cobra.MaximumNArgs(1),
 	Example: `  flotio project update 3 --name "New Name"
   flotio project update 3 --flutter-version 3.22.0 --build-mode release
   flotio project update --repo https://github.com/user/repo   # uses project-id from config`,

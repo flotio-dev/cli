@@ -4,9 +4,9 @@ import (
 	"fmt"
 
 	"github.com/flotio-dev/cli/internal/config"
+	apiclient "github.com/flotio-dev/cli/pkg/api/client"
 	"github.com/flotio-dev/cli/pkg/client"
 	"github.com/flotio-dev/cli/pkg/display"
-	apiclient "github.com/flotio-dev/cli/pkg/api/client"
 	"github.com/spf13/cobra"
 )
 

@@ -150,9 +150,9 @@ var envGetCmd = &cobra.Command{
 }
 
 var envCreateCmd = &cobra.Command{
-	Use:   "create <key> <value>",
-	Short: "Create an environment variable or file",
-	Args:  cobra.ExactArgs(2),
+	Use:     "create <key> <value>",
+	Short:   "Create an environment variable or file",
+	Args:    cobra.ExactArgs(2),
 	Example: `  flotio env create DATABASE_URL "postgres://..."`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if !client.IsLoggedIn() {
