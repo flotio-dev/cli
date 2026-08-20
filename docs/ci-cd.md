@@ -6,8 +6,12 @@ macOS and Windows. The stable required check is `ci-success`.
 
 Only an explicit strict `vX.Y.Z` tag creates a GitHub release. The release uses
 the already-built matrix artifacts, adds SHA-256 checksums and an SPDX SBOM,
-creates GitHub-native provenance and SBOM attestations, verifies them, then
+optionally creates and verifies GitHub-native attestations, then
 publishes the release. The workflow never creates tags automatically.
+
+Public repositories enable attestations automatically. Private repositories skip
+them unless `ATTESTATIONS_ENABLED=true`; enable that repository variable only when
+the organization plan supports private-repository attestations.
 
 No repository secret is required. `GITHUB_TOKEN` receives `contents: write`
 only in the release job, while OIDC and attestation writes are also confined to

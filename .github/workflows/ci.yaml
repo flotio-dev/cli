@@ -213,23 +213,30 @@ jobs:
           version: v0.74.0
 
       - name: Attest provenance
+        if: github.event.repository.private == false || vars.ATTESTATIONS_ENABLED == 'true'
         uses: actions/attest@508db95dd578ae2727ebd6217d5ba78e4fbda05d # v4.2.1
         with:
           subject-path: dist/flotio-*
 
       - name: Attest SBOM
+        if: github.event.repository.private == false || vars.ATTESTATIONS_ENABLED == 'true'
         uses: actions/attest@508db95dd578ae2727ebd6217d5ba78e4fbda05d # v4.2.1
         with:
           subject-path: dist/flotio-*
           sbom-path: sbom.spdx.json
 
       - name: Verify attestations
+        if: github.event.repository.private == false || vars.ATTESTATIONS_ENABLED == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           for file in dist/flotio-*; do
             gh attestation verify "$file" --repo "$GITHUB_REPOSITORY"
           done
+
+      - name: Explain unavailable attestations
+        if: github.event.repository.private && vars.ATTESTATIONS_ENABLED != 'true'
+        run: echo "::notice::Artifact attestations are disabled for private repositories. Set ATTESTATIONS_ENABLED=true when GitHub Enterprise Cloud is available."
 
       - name: Create GitHub release
         env:
