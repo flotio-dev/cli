@@ -43,7 +43,7 @@ fi
 
 # --- Download ---
 TMPDIR=$(mktemp -d)
-trap 'rm -rf "$TMPDIR"' EXIT
+trap 'rm -rf "$TMPDIR"' EXIT INT TERM HUP
 
 DEST="$TMPDIR/$BINARY"
 if ! curl -fsSL -o "$DEST" "$RELEASE_URL"; then
@@ -53,28 +53,56 @@ if ! curl -fsSL -o "$DEST" "$RELEASE_URL"; then
 fi
 chmod +x "$DEST"
 
-# --- Install ---
-INSTALL_DIR=""
-if [ -w /usr/local/bin ]; then
+# --- Determine Install Directory ---
+INSTALL_DIR="${FLOTIO_INSTALL_DIR:-${INSTALL_DIR:-}}"
+
+if [ -n "$INSTALL_DIR" ]; then
+  if mkdir -p "$INSTALL_DIR" 2>/dev/null && [ -w "$INSTALL_DIR" ]; then
+    mv "$DEST" "$INSTALL_DIR/$BINARY"
+  elif command -v sudo >/dev/null 2>&1; then
+    echo "Installing to $INSTALL_DIR (sudo required)..."
+    sudo mkdir -p "$INSTALL_DIR"
+    sudo mv "$DEST" "$INSTALL_DIR/$BINARY"
+    sudo chmod +x "$INSTALL_DIR/$BINARY"
+  else
+    echo "Cannot write to $INSTALL_DIR and sudo is not available." >&2
+    exit 1
+  fi
+elif [ "$(id -u 2>/dev/null || true)" = "0" ]; then
   INSTALL_DIR="/usr/local/bin"
+  mkdir -p "$INSTALL_DIR"
+  mv "$DEST" "$INSTALL_DIR/$BINARY"
+elif [ -d /usr/local/bin ] && [ -w /usr/local/bin ]; then
+  INSTALL_DIR="/usr/local/bin"
+  mv "$DEST" "$INSTALL_DIR/$BINARY"
 elif command -v sudo >/dev/null 2>&1; then
   INSTALL_DIR="/usr/local/bin"
   echo "Installing to /usr/local/bin (sudo required)..."
-  sudo mv "$DEST" "$INSTALL_DIR/$BINARY"
-  echo "✓ flotio installed to /usr/local/bin/flotio"
-  exit 0
+  if sudo mkdir -p "$INSTALL_DIR" && sudo mv "$DEST" "$INSTALL_DIR/$BINARY"; then
+    sudo chmod +x "$INSTALL_DIR/$BINARY"
+  else
+    echo "sudo install failed, falling back to $HOME/.local/bin..." >&2
+    INSTALL_DIR="$HOME/.local/bin"
+    mkdir -p "$INSTALL_DIR"
+    mv "$DEST" "$INSTALL_DIR/$BINARY"
+  fi
 else
   INSTALL_DIR="$HOME/.local/bin"
   mkdir -p "$INSTALL_DIR"
+  mv "$DEST" "$INSTALL_DIR/$BINARY"
 fi
 
-mv "$DEST" "$INSTALL_DIR/$BINARY"
-echo "✓ flotio installed to $INSTALL_DIR/flotio"
+chmod +x "$INSTALL_DIR/$BINARY" 2>/dev/null || true
+
+echo "✓ flotio installed to $INSTALL_DIR/$BINARY"
 
 # --- PATH check ---
-if ! echo "$PATH" | tr ':' '\n' | grep -qxF "$INSTALL_DIR"; then
-  echo ""
-  echo "⚠ $INSTALL_DIR is not in your PATH."
-  echo "  Add this to your ~/.bashrc or ~/.zshrc:"
-  echo "  export PATH=\"$INSTALL_DIR:\$PATH\""
-fi
+case ":$PATH:" in
+  *":$INSTALL_DIR:"*) ;;
+  *)
+    echo ""
+    echo "⚠ $INSTALL_DIR is not in your PATH."
+    echo "  Add this to your ~/.bashrc or ~/.zshrc:"
+    echo "  export PATH=\"$INSTALL_DIR:\$PATH\""
+    ;;
+esac

@@ -307,7 +307,7 @@ Common tasks (run from `cli/` inside the dev shell):
 
 ### CI & releases
 
-The [`.github/workflows/build.yml`](.github/workflows/build.yml) workflow runs on every push and PR. Pushing a `v*` tag cross-compiles binaries for `linux/{amd64,arm64}`, `darwin/{amd64,arm64}`, and `windows/amd64`, then publishes a GitHub Release with auto-generated notes. Releases power both the install scripts and `flotio update`.
+The [`.github/workflows/ci.yaml`](.github/workflows/ci.yaml) workflow runs on every push and PR. Pushing a `v*` tag cross-compiles binaries for `linux/{amd64,arm64}`, `darwin/{amd64,arm64}`, and `windows/amd64`, then publishes a GitHub Release with auto-generated notes. Releases power both the install scripts and `flotio update`.
 
 ---
 
