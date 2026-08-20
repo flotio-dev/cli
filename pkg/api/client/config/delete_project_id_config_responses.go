@@ -60,7 +60,7 @@ DeleteProjectIDConfigOK describes a response with status code 200, with default 
 OK
 */
 type DeleteProjectIDConfigOK struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this delete project Id config o k response has a 2xx status code
@@ -103,7 +103,7 @@ func (o *DeleteProjectIDConfigOK) String() string {
 	return fmt.Sprintf("[DELETE /project/{id}/config][%d] deleteProjectIdConfigOK %s", 200, payload)
 }
 
-func (o *DeleteProjectIDConfigOK) GetPayload() map[string]string {
+func (o *DeleteProjectIDConfigOK) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -128,7 +128,7 @@ DeleteProjectIDConfigUnauthorized describes a response with status code 401, wit
 Unauthorized
 */
 type DeleteProjectIDConfigUnauthorized struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this delete project Id config unauthorized response has a 2xx status code
@@ -171,7 +171,7 @@ func (o *DeleteProjectIDConfigUnauthorized) String() string {
 	return fmt.Sprintf("[DELETE /project/{id}/config][%d] deleteProjectIdConfigUnauthorized %s", 401, payload)
 }
 
-func (o *DeleteProjectIDConfigUnauthorized) GetPayload() map[string]string {
+func (o *DeleteProjectIDConfigUnauthorized) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -196,7 +196,7 @@ DeleteProjectIDConfigNotFound describes a response with status code 404, with de
 Not Found
 */
 type DeleteProjectIDConfigNotFound struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this delete project Id config not found response has a 2xx status code
@@ -239,7 +239,7 @@ func (o *DeleteProjectIDConfigNotFound) String() string {
 	return fmt.Sprintf("[DELETE /project/{id}/config][%d] deleteProjectIdConfigNotFound %s", 404, payload)
 }
 
-func (o *DeleteProjectIDConfigNotFound) GetPayload() map[string]string {
+func (o *DeleteProjectIDConfigNotFound) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -264,7 +264,7 @@ DeleteProjectIDConfigInternalServerError describes a response with status code 5
 Internal Server Error
 */
 type DeleteProjectIDConfigInternalServerError struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this delete project Id config internal server error response has a 2xx status code
@@ -307,7 +307,7 @@ func (o *DeleteProjectIDConfigInternalServerError) String() string {
 	return fmt.Sprintf("[DELETE /project/{id}/config][%d] deleteProjectIdConfigInternalServerError %s", 500, payload)
 }
 
-func (o *DeleteProjectIDConfigInternalServerError) GetPayload() map[string]string {
+func (o *DeleteProjectIDConfigInternalServerError) GetPayload() map[string]any {
 	return o.Payload
 }
 

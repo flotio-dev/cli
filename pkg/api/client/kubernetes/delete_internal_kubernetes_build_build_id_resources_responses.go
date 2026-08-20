@@ -104,7 +104,7 @@ DeleteInternalKubernetesBuildBuildIDResourcesInternalServerError describes a res
 Internal Server Error
 */
 type DeleteInternalKubernetesBuildBuildIDResourcesInternalServerError struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this delete internal kubernetes build build Id resources internal server error response has a 2xx status code
@@ -147,7 +147,7 @@ func (o *DeleteInternalKubernetesBuildBuildIDResourcesInternalServerError) Strin
 	return fmt.Sprintf("[DELETE /internal/kubernetes/build/{buildID}/resources][%d] deleteInternalKubernetesBuildBuildIdResourcesInternalServerError %s", 500, payload)
 }
 
-func (o *DeleteInternalKubernetesBuildBuildIDResourcesInternalServerError) GetPayload() map[string]string {
+func (o *DeleteInternalKubernetesBuildBuildIDResourcesInternalServerError) GetPayload() map[string]any {
 	return o.Payload
 }
 

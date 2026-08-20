@@ -137,7 +137,7 @@ PostProjectBadRequest describes a response with status code 400, with default he
 Bad Request
 */
 type PostProjectBadRequest struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this post project bad request response has a 2xx status code
@@ -180,7 +180,7 @@ func (o *PostProjectBadRequest) String() string {
 	return fmt.Sprintf("[POST /project][%d] postProjectBadRequest %s", 400, payload)
 }
 
-func (o *PostProjectBadRequest) GetPayload() map[string]string {
+func (o *PostProjectBadRequest) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -205,7 +205,7 @@ PostProjectUnauthorized describes a response with status code 401, with default 
 Unauthorized
 */
 type PostProjectUnauthorized struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this post project unauthorized response has a 2xx status code
@@ -248,7 +248,7 @@ func (o *PostProjectUnauthorized) String() string {
 	return fmt.Sprintf("[POST /project][%d] postProjectUnauthorized %s", 401, payload)
 }
 
-func (o *PostProjectUnauthorized) GetPayload() map[string]string {
+func (o *PostProjectUnauthorized) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -273,7 +273,7 @@ PostProjectNotFound describes a response with status code 404, with default head
 Not Found
 */
 type PostProjectNotFound struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this post project not found response has a 2xx status code
@@ -316,7 +316,7 @@ func (o *PostProjectNotFound) String() string {
 	return fmt.Sprintf("[POST /project][%d] postProjectNotFound %s", 404, payload)
 }
 
-func (o *PostProjectNotFound) GetPayload() map[string]string {
+func (o *PostProjectNotFound) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -341,7 +341,7 @@ PostProjectInternalServerError describes a response with status code 500, with d
 Internal Server Error
 */
 type PostProjectInternalServerError struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this post project internal server error response has a 2xx status code
@@ -384,7 +384,7 @@ func (o *PostProjectInternalServerError) String() string {
 	return fmt.Sprintf("[POST /project][%d] postProjectInternalServerError %s", 500, payload)
 }
 
-func (o *PostProjectInternalServerError) GetPayload() map[string]string {
+func (o *PostProjectInternalServerError) GetPayload() map[string]any {
 	return o.Payload
 }
 

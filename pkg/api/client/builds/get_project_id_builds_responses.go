@@ -131,7 +131,7 @@ GetProjectIDBuildsBadRequest describes a response with status code 400, with def
 Bad Request
 */
 type GetProjectIDBuildsBadRequest struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this get project Id builds bad request response has a 2xx status code
@@ -174,7 +174,7 @@ func (o *GetProjectIDBuildsBadRequest) String() string {
 	return fmt.Sprintf("[GET /project/{id}/builds][%d] getProjectIdBuildsBadRequest %s", 400, payload)
 }
 
-func (o *GetProjectIDBuildsBadRequest) GetPayload() map[string]string {
+func (o *GetProjectIDBuildsBadRequest) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -199,7 +199,7 @@ GetProjectIDBuildsUnauthorized describes a response with status code 401, with d
 Unauthorized
 */
 type GetProjectIDBuildsUnauthorized struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this get project Id builds unauthorized response has a 2xx status code
@@ -242,7 +242,7 @@ func (o *GetProjectIDBuildsUnauthorized) String() string {
 	return fmt.Sprintf("[GET /project/{id}/builds][%d] getProjectIdBuildsUnauthorized %s", 401, payload)
 }
 
-func (o *GetProjectIDBuildsUnauthorized) GetPayload() map[string]string {
+func (o *GetProjectIDBuildsUnauthorized) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -267,7 +267,7 @@ GetProjectIDBuildsInternalServerError describes a response with status code 500,
 Internal Server Error
 */
 type GetProjectIDBuildsInternalServerError struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this get project Id builds internal server error response has a 2xx status code
@@ -310,7 +310,7 @@ func (o *GetProjectIDBuildsInternalServerError) String() string {
 	return fmt.Sprintf("[GET /project/{id}/builds][%d] getProjectIdBuildsInternalServerError %s", 500, payload)
 }
 
-func (o *GetProjectIDBuildsInternalServerError) GetPayload() map[string]string {
+func (o *GetProjectIDBuildsInternalServerError) GetPayload() map[string]any {
 	return o.Payload
 }
 

@@ -137,7 +137,7 @@ GetProjectIDBuildBuildIDLogsBadRequest describes a response with status code 400
 Bad Request
 */
 type GetProjectIDBuildBuildIDLogsBadRequest struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this get project Id build build Id logs bad request response has a 2xx status code
@@ -180,7 +180,7 @@ func (o *GetProjectIDBuildBuildIDLogsBadRequest) String() string {
 	return fmt.Sprintf("[GET /project/{id}/build/{buildId}/logs][%d] getProjectIdBuildBuildIdLogsBadRequest %s", 400, payload)
 }
 
-func (o *GetProjectIDBuildBuildIDLogsBadRequest) GetPayload() map[string]string {
+func (o *GetProjectIDBuildBuildIDLogsBadRequest) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -205,7 +205,7 @@ GetProjectIDBuildBuildIDLogsUnauthorized describes a response with status code 4
 Unauthorized
 */
 type GetProjectIDBuildBuildIDLogsUnauthorized struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this get project Id build build Id logs unauthorized response has a 2xx status code
@@ -248,7 +248,7 @@ func (o *GetProjectIDBuildBuildIDLogsUnauthorized) String() string {
 	return fmt.Sprintf("[GET /project/{id}/build/{buildId}/logs][%d] getProjectIdBuildBuildIdLogsUnauthorized %s", 401, payload)
 }
 
-func (o *GetProjectIDBuildBuildIDLogsUnauthorized) GetPayload() map[string]string {
+func (o *GetProjectIDBuildBuildIDLogsUnauthorized) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -273,7 +273,7 @@ GetProjectIDBuildBuildIDLogsNotFound describes a response with status code 404, 
 Not Found
 */
 type GetProjectIDBuildBuildIDLogsNotFound struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this get project Id build build Id logs not found response has a 2xx status code
@@ -316,7 +316,7 @@ func (o *GetProjectIDBuildBuildIDLogsNotFound) String() string {
 	return fmt.Sprintf("[GET /project/{id}/build/{buildId}/logs][%d] getProjectIdBuildBuildIdLogsNotFound %s", 404, payload)
 }
 
-func (o *GetProjectIDBuildBuildIDLogsNotFound) GetPayload() map[string]string {
+func (o *GetProjectIDBuildBuildIDLogsNotFound) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -341,7 +341,7 @@ GetProjectIDBuildBuildIDLogsInternalServerError describes a response with status
 Internal Server Error
 */
 type GetProjectIDBuildBuildIDLogsInternalServerError struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this get project Id build build Id logs internal server error response has a 2xx status code
@@ -384,7 +384,7 @@ func (o *GetProjectIDBuildBuildIDLogsInternalServerError) String() string {
 	return fmt.Sprintf("[GET /project/{id}/build/{buildId}/logs][%d] getProjectIdBuildBuildIdLogsInternalServerError %s", 500, payload)
 }
 
-func (o *GetProjectIDBuildBuildIDLogsInternalServerError) GetPayload() map[string]string {
+func (o *GetProjectIDBuildBuildIDLogsInternalServerError) GetPayload() map[string]any {
 	return o.Payload
 }
 

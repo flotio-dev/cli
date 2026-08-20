@@ -122,7 +122,7 @@ GetGooglePlayCredentialsUnauthorized describes a response with status code 401, 
 Unauthorized
 */
 type GetGooglePlayCredentialsUnauthorized struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this get google play credentials unauthorized response has a 2xx status code
@@ -165,7 +165,7 @@ func (o *GetGooglePlayCredentialsUnauthorized) String() string {
 	return fmt.Sprintf("[GET /google-play-credentials][%d] getGooglePlayCredentialsUnauthorized %s", 401, payload)
 }
 
-func (o *GetGooglePlayCredentialsUnauthorized) GetPayload() map[string]string {
+func (o *GetGooglePlayCredentialsUnauthorized) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -190,7 +190,7 @@ GetGooglePlayCredentialsInternalServerError describes a response with status cod
 Internal Server Error
 */
 type GetGooglePlayCredentialsInternalServerError struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this get google play credentials internal server error response has a 2xx status code
@@ -233,7 +233,7 @@ func (o *GetGooglePlayCredentialsInternalServerError) String() string {
 	return fmt.Sprintf("[GET /google-play-credentials][%d] getGooglePlayCredentialsInternalServerError %s", 500, payload)
 }
 
-func (o *GetGooglePlayCredentialsInternalServerError) GetPayload() map[string]string {
+func (o *GetGooglePlayCredentialsInternalServerError) GetPayload() map[string]any {
 	return o.Payload
 }
 

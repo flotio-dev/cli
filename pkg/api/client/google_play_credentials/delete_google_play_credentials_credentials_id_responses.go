@@ -60,7 +60,7 @@ DeleteGooglePlayCredentialsCredentialsIDOK describes a response with status code
 OK
 */
 type DeleteGooglePlayCredentialsCredentialsIDOK struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this delete google play credentials credentials Id o k response has a 2xx status code
@@ -103,7 +103,7 @@ func (o *DeleteGooglePlayCredentialsCredentialsIDOK) String() string {
 	return fmt.Sprintf("[DELETE /google-play-credentials/{credentialsId}][%d] deleteGooglePlayCredentialsCredentialsIdOK %s", 200, payload)
 }
 
-func (o *DeleteGooglePlayCredentialsCredentialsIDOK) GetPayload() map[string]string {
+func (o *DeleteGooglePlayCredentialsCredentialsIDOK) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -128,7 +128,7 @@ DeleteGooglePlayCredentialsCredentialsIDUnauthorized describes a response with s
 Unauthorized
 */
 type DeleteGooglePlayCredentialsCredentialsIDUnauthorized struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this delete google play credentials credentials Id unauthorized response has a 2xx status code
@@ -171,7 +171,7 @@ func (o *DeleteGooglePlayCredentialsCredentialsIDUnauthorized) String() string {
 	return fmt.Sprintf("[DELETE /google-play-credentials/{credentialsId}][%d] deleteGooglePlayCredentialsCredentialsIdUnauthorized %s", 401, payload)
 }
 
-func (o *DeleteGooglePlayCredentialsCredentialsIDUnauthorized) GetPayload() map[string]string {
+func (o *DeleteGooglePlayCredentialsCredentialsIDUnauthorized) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -196,7 +196,7 @@ DeleteGooglePlayCredentialsCredentialsIDNotFound describes a response with statu
 Not Found
 */
 type DeleteGooglePlayCredentialsCredentialsIDNotFound struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this delete google play credentials credentials Id not found response has a 2xx status code
@@ -239,7 +239,7 @@ func (o *DeleteGooglePlayCredentialsCredentialsIDNotFound) String() string {
 	return fmt.Sprintf("[DELETE /google-play-credentials/{credentialsId}][%d] deleteGooglePlayCredentialsCredentialsIdNotFound %s", 404, payload)
 }
 
-func (o *DeleteGooglePlayCredentialsCredentialsIDNotFound) GetPayload() map[string]string {
+func (o *DeleteGooglePlayCredentialsCredentialsIDNotFound) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -264,7 +264,7 @@ DeleteGooglePlayCredentialsCredentialsIDInternalServerError describes a response
 Internal Server Error
 */
 type DeleteGooglePlayCredentialsCredentialsIDInternalServerError struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this delete google play credentials credentials Id internal server error response has a 2xx status code
@@ -307,7 +307,7 @@ func (o *DeleteGooglePlayCredentialsCredentialsIDInternalServerError) String() s
 	return fmt.Sprintf("[DELETE /google-play-credentials/{credentialsId}][%d] deleteGooglePlayCredentialsCredentialsIdInternalServerError %s", 500, payload)
 }
 
-func (o *DeleteGooglePlayCredentialsCredentialsIDInternalServerError) GetPayload() map[string]string {
+func (o *DeleteGooglePlayCredentialsCredentialsIDInternalServerError) GetPayload() map[string]any {
 	return o.Payload
 }
 

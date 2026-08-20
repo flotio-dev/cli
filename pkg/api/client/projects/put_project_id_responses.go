@@ -137,7 +137,7 @@ PutProjectIDBadRequest describes a response with status code 400, with default h
 Bad Request
 */
 type PutProjectIDBadRequest struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this put project Id bad request response has a 2xx status code
@@ -180,7 +180,7 @@ func (o *PutProjectIDBadRequest) String() string {
 	return fmt.Sprintf("[PUT /project/{id}][%d] putProjectIdBadRequest %s", 400, payload)
 }
 
-func (o *PutProjectIDBadRequest) GetPayload() map[string]string {
+func (o *PutProjectIDBadRequest) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -205,7 +205,7 @@ PutProjectIDUnauthorized describes a response with status code 401, with default
 Unauthorized
 */
 type PutProjectIDUnauthorized struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this put project Id unauthorized response has a 2xx status code
@@ -248,7 +248,7 @@ func (o *PutProjectIDUnauthorized) String() string {
 	return fmt.Sprintf("[PUT /project/{id}][%d] putProjectIdUnauthorized %s", 401, payload)
 }
 
-func (o *PutProjectIDUnauthorized) GetPayload() map[string]string {
+func (o *PutProjectIDUnauthorized) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -273,7 +273,7 @@ PutProjectIDNotFound describes a response with status code 404, with default hea
 Not Found
 */
 type PutProjectIDNotFound struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this put project Id not found response has a 2xx status code
@@ -316,7 +316,7 @@ func (o *PutProjectIDNotFound) String() string {
 	return fmt.Sprintf("[PUT /project/{id}][%d] putProjectIdNotFound %s", 404, payload)
 }
 
-func (o *PutProjectIDNotFound) GetPayload() map[string]string {
+func (o *PutProjectIDNotFound) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -341,7 +341,7 @@ PutProjectIDInternalServerError describes a response with status code 500, with 
 Internal Server Error
 */
 type PutProjectIDInternalServerError struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this put project Id internal server error response has a 2xx status code
@@ -384,7 +384,7 @@ func (o *PutProjectIDInternalServerError) String() string {
 	return fmt.Sprintf("[PUT /project/{id}][%d] putProjectIdInternalServerError %s", 500, payload)
 }
 
-func (o *PutProjectIDInternalServerError) GetPayload() map[string]string {
+func (o *PutProjectIDInternalServerError) GetPayload() map[string]any {
 	return o.Payload
 }
 

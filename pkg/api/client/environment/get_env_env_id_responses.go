@@ -134,7 +134,7 @@ GetEnvEnvIDBadRequest describes a response with status code 400, with default he
 Bad Request
 */
 type GetEnvEnvIDBadRequest struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this get env env Id bad request response has a 2xx status code
@@ -177,7 +177,7 @@ func (o *GetEnvEnvIDBadRequest) String() string {
 	return fmt.Sprintf("[GET /env/{envId}][%d] getEnvEnvIdBadRequest %s", 400, payload)
 }
 
-func (o *GetEnvEnvIDBadRequest) GetPayload() map[string]string {
+func (o *GetEnvEnvIDBadRequest) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -202,7 +202,7 @@ GetEnvEnvIDUnauthorized describes a response with status code 401, with default 
 Unauthorized
 */
 type GetEnvEnvIDUnauthorized struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this get env env Id unauthorized response has a 2xx status code
@@ -245,7 +245,7 @@ func (o *GetEnvEnvIDUnauthorized) String() string {
 	return fmt.Sprintf("[GET /env/{envId}][%d] getEnvEnvIdUnauthorized %s", 401, payload)
 }
 
-func (o *GetEnvEnvIDUnauthorized) GetPayload() map[string]string {
+func (o *GetEnvEnvIDUnauthorized) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -270,7 +270,7 @@ GetEnvEnvIDNotFound describes a response with status code 404, with default head
 Not Found
 */
 type GetEnvEnvIDNotFound struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this get env env Id not found response has a 2xx status code
@@ -313,7 +313,7 @@ func (o *GetEnvEnvIDNotFound) String() string {
 	return fmt.Sprintf("[GET /env/{envId}][%d] getEnvEnvIdNotFound %s", 404, payload)
 }
 
-func (o *GetEnvEnvIDNotFound) GetPayload() map[string]string {
+func (o *GetEnvEnvIDNotFound) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -338,7 +338,7 @@ GetEnvEnvIDInternalServerError describes a response with status code 500, with d
 Internal Server Error
 */
 type GetEnvEnvIDInternalServerError struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this get env env Id internal server error response has a 2xx status code
@@ -381,7 +381,7 @@ func (o *GetEnvEnvIDInternalServerError) String() string {
 	return fmt.Sprintf("[GET /env/{envId}][%d] getEnvEnvIdInternalServerError %s", 500, payload)
 }
 
-func (o *GetEnvEnvIDInternalServerError) GetPayload() map[string]string {
+func (o *GetEnvEnvIDInternalServerError) GetPayload() map[string]any {
 	return o.Payload
 }
 

@@ -122,7 +122,7 @@ PostGooglePlayCredentialsUnauthorized describes a response with status code 401,
 Unauthorized
 */
 type PostGooglePlayCredentialsUnauthorized struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this post google play credentials unauthorized response has a 2xx status code
@@ -165,7 +165,7 @@ func (o *PostGooglePlayCredentialsUnauthorized) String() string {
 	return fmt.Sprintf("[POST /google-play-credentials][%d] postGooglePlayCredentialsUnauthorized %s", 401, payload)
 }
 
-func (o *PostGooglePlayCredentialsUnauthorized) GetPayload() map[string]string {
+func (o *PostGooglePlayCredentialsUnauthorized) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -190,7 +190,7 @@ PostGooglePlayCredentialsInternalServerError describes a response with status co
 Internal Server Error
 */
 type PostGooglePlayCredentialsInternalServerError struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this post google play credentials internal server error response has a 2xx status code
@@ -233,7 +233,7 @@ func (o *PostGooglePlayCredentialsInternalServerError) String() string {
 	return fmt.Sprintf("[POST /google-play-credentials][%d] postGooglePlayCredentialsInternalServerError %s", 500, payload)
 }
 
-func (o *PostGooglePlayCredentialsInternalServerError) GetPayload() map[string]string {
+func (o *PostGooglePlayCredentialsInternalServerError) GetPayload() map[string]any {
 	return o.Payload
 }
 

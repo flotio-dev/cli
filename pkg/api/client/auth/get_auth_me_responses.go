@@ -122,7 +122,7 @@ GetAuthMeUnauthorized describes a response with status code 401, with default he
 Unauthorized
 */
 type GetAuthMeUnauthorized struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this get auth me unauthorized response has a 2xx status code
@@ -165,7 +165,7 @@ func (o *GetAuthMeUnauthorized) String() string {
 	return fmt.Sprintf("[GET /auth/me][%d] getAuthMeUnauthorized %s", 401, payload)
 }
 
-func (o *GetAuthMeUnauthorized) GetPayload() map[string]string {
+func (o *GetAuthMeUnauthorized) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -190,7 +190,7 @@ GetAuthMeNotFound describes a response with status code 404, with default header
 Not Found
 */
 type GetAuthMeNotFound struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this get auth me not found response has a 2xx status code
@@ -233,7 +233,7 @@ func (o *GetAuthMeNotFound) String() string {
 	return fmt.Sprintf("[GET /auth/me][%d] getAuthMeNotFound %s", 404, payload)
 }
 
-func (o *GetAuthMeNotFound) GetPayload() map[string]string {
+func (o *GetAuthMeNotFound) GetPayload() map[string]any {
 	return o.Payload
 }
 

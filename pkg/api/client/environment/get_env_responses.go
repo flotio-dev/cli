@@ -122,7 +122,7 @@ GetEnvUnauthorized describes a response with status code 401, with default heade
 Unauthorized
 */
 type GetEnvUnauthorized struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this get env unauthorized response has a 2xx status code
@@ -165,7 +165,7 @@ func (o *GetEnvUnauthorized) String() string {
 	return fmt.Sprintf("[GET /env][%d] getEnvUnauthorized %s", 401, payload)
 }
 
-func (o *GetEnvUnauthorized) GetPayload() map[string]string {
+func (o *GetEnvUnauthorized) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -190,7 +190,7 @@ GetEnvInternalServerError describes a response with status code 500, with defaul
 Internal Server Error
 */
 type GetEnvInternalServerError struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this get env internal server error response has a 2xx status code
@@ -233,7 +233,7 @@ func (o *GetEnvInternalServerError) String() string {
 	return fmt.Sprintf("[GET /env][%d] getEnvInternalServerError %s", 500, payload)
 }
 
-func (o *GetEnvInternalServerError) GetPayload() map[string]string {
+func (o *GetEnvInternalServerError) GetPayload() map[string]any {
 	return o.Payload
 }
 

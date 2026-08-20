@@ -137,7 +137,7 @@ GetProjectIDCacheEntriesBadRequest describes a response with status code 400, wi
 Bad Request
 */
 type GetProjectIDCacheEntriesBadRequest struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this get project Id cache entries bad request response has a 2xx status code
@@ -180,7 +180,7 @@ func (o *GetProjectIDCacheEntriesBadRequest) String() string {
 	return fmt.Sprintf("[GET /project/{id}/cache/entries][%d] getProjectIdCacheEntriesBadRequest %s", 400, payload)
 }
 
-func (o *GetProjectIDCacheEntriesBadRequest) GetPayload() map[string]string {
+func (o *GetProjectIDCacheEntriesBadRequest) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -205,7 +205,7 @@ GetProjectIDCacheEntriesUnauthorized describes a response with status code 401, 
 Unauthorized
 */
 type GetProjectIDCacheEntriesUnauthorized struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this get project Id cache entries unauthorized response has a 2xx status code
@@ -248,7 +248,7 @@ func (o *GetProjectIDCacheEntriesUnauthorized) String() string {
 	return fmt.Sprintf("[GET /project/{id}/cache/entries][%d] getProjectIdCacheEntriesUnauthorized %s", 401, payload)
 }
 
-func (o *GetProjectIDCacheEntriesUnauthorized) GetPayload() map[string]string {
+func (o *GetProjectIDCacheEntriesUnauthorized) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -273,7 +273,7 @@ GetProjectIDCacheEntriesNotFound describes a response with status code 404, with
 Not Found
 */
 type GetProjectIDCacheEntriesNotFound struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this get project Id cache entries not found response has a 2xx status code
@@ -316,7 +316,7 @@ func (o *GetProjectIDCacheEntriesNotFound) String() string {
 	return fmt.Sprintf("[GET /project/{id}/cache/entries][%d] getProjectIdCacheEntriesNotFound %s", 404, payload)
 }
 
-func (o *GetProjectIDCacheEntriesNotFound) GetPayload() map[string]string {
+func (o *GetProjectIDCacheEntriesNotFound) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -341,7 +341,7 @@ GetProjectIDCacheEntriesInternalServerError describes a response with status cod
 Internal Server Error
 */
 type GetProjectIDCacheEntriesInternalServerError struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this get project Id cache entries internal server error response has a 2xx status code
@@ -384,7 +384,7 @@ func (o *GetProjectIDCacheEntriesInternalServerError) String() string {
 	return fmt.Sprintf("[GET /project/{id}/cache/entries][%d] getProjectIdCacheEntriesInternalServerError %s", 500, payload)
 }
 
-func (o *GetProjectIDCacheEntriesInternalServerError) GetPayload() map[string]string {
+func (o *GetProjectIDCacheEntriesInternalServerError) GetPayload() map[string]any {
 	return o.Payload
 }
 

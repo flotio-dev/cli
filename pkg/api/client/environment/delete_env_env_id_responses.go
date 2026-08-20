@@ -134,7 +134,7 @@ DeleteEnvEnvIDBadRequest describes a response with status code 400, with default
 Bad Request
 */
 type DeleteEnvEnvIDBadRequest struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this delete env env Id bad request response has a 2xx status code
@@ -177,7 +177,7 @@ func (o *DeleteEnvEnvIDBadRequest) String() string {
 	return fmt.Sprintf("[DELETE /env/{envId}][%d] deleteEnvEnvIdBadRequest %s", 400, payload)
 }
 
-func (o *DeleteEnvEnvIDBadRequest) GetPayload() map[string]string {
+func (o *DeleteEnvEnvIDBadRequest) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -202,7 +202,7 @@ DeleteEnvEnvIDUnauthorized describes a response with status code 401, with defau
 Unauthorized
 */
 type DeleteEnvEnvIDUnauthorized struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this delete env env Id unauthorized response has a 2xx status code
@@ -245,7 +245,7 @@ func (o *DeleteEnvEnvIDUnauthorized) String() string {
 	return fmt.Sprintf("[DELETE /env/{envId}][%d] deleteEnvEnvIdUnauthorized %s", 401, payload)
 }
 
-func (o *DeleteEnvEnvIDUnauthorized) GetPayload() map[string]string {
+func (o *DeleteEnvEnvIDUnauthorized) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -270,7 +270,7 @@ DeleteEnvEnvIDNotFound describes a response with status code 404, with default h
 Not Found
 */
 type DeleteEnvEnvIDNotFound struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this delete env env Id not found response has a 2xx status code
@@ -313,7 +313,7 @@ func (o *DeleteEnvEnvIDNotFound) String() string {
 	return fmt.Sprintf("[DELETE /env/{envId}][%d] deleteEnvEnvIdNotFound %s", 404, payload)
 }
 
-func (o *DeleteEnvEnvIDNotFound) GetPayload() map[string]string {
+func (o *DeleteEnvEnvIDNotFound) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -338,7 +338,7 @@ DeleteEnvEnvIDInternalServerError describes a response with status code 500, wit
 Internal Server Error
 */
 type DeleteEnvEnvIDInternalServerError struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this delete env env Id internal server error response has a 2xx status code
@@ -381,7 +381,7 @@ func (o *DeleteEnvEnvIDInternalServerError) String() string {
 	return fmt.Sprintf("[DELETE /env/{envId}][%d] deleteEnvEnvIdInternalServerError %s", 500, payload)
 }
 
-func (o *DeleteEnvEnvIDInternalServerError) GetPayload() map[string]string {
+func (o *DeleteEnvEnvIDInternalServerError) GetPayload() map[string]any {
 	return o.Payload
 }
 

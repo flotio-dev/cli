@@ -116,7 +116,7 @@ PostInternalKubernetesConfigmapInternalServerError describes a response with sta
 Internal Server Error
 */
 type PostInternalKubernetesConfigmapInternalServerError struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this post internal kubernetes configmap internal server error response has a 2xx status code
@@ -159,7 +159,7 @@ func (o *PostInternalKubernetesConfigmapInternalServerError) String() string {
 	return fmt.Sprintf("[POST /internal/kubernetes/configmap][%d] postInternalKubernetesConfigmapInternalServerError %s", 500, payload)
 }
 
-func (o *PostInternalKubernetesConfigmapInternalServerError) GetPayload() map[string]string {
+func (o *PostInternalKubernetesConfigmapInternalServerError) GetPayload() map[string]any {
 	return o.Payload
 }
 

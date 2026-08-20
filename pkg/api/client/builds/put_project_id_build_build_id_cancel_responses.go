@@ -137,7 +137,7 @@ PutProjectIDBuildBuildIDCancelBadRequest describes a response with status code 4
 Bad Request
 */
 type PutProjectIDBuildBuildIDCancelBadRequest struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this put project Id build build Id cancel bad request response has a 2xx status code
@@ -180,7 +180,7 @@ func (o *PutProjectIDBuildBuildIDCancelBadRequest) String() string {
 	return fmt.Sprintf("[PUT /project/{id}/build/{buildId}/cancel][%d] putProjectIdBuildBuildIdCancelBadRequest %s", 400, payload)
 }
 
-func (o *PutProjectIDBuildBuildIDCancelBadRequest) GetPayload() map[string]string {
+func (o *PutProjectIDBuildBuildIDCancelBadRequest) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -205,7 +205,7 @@ PutProjectIDBuildBuildIDCancelUnauthorized describes a response with status code
 Unauthorized
 */
 type PutProjectIDBuildBuildIDCancelUnauthorized struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this put project Id build build Id cancel unauthorized response has a 2xx status code
@@ -248,7 +248,7 @@ func (o *PutProjectIDBuildBuildIDCancelUnauthorized) String() string {
 	return fmt.Sprintf("[PUT /project/{id}/build/{buildId}/cancel][%d] putProjectIdBuildBuildIdCancelUnauthorized %s", 401, payload)
 }
 
-func (o *PutProjectIDBuildBuildIDCancelUnauthorized) GetPayload() map[string]string {
+func (o *PutProjectIDBuildBuildIDCancelUnauthorized) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -273,7 +273,7 @@ PutProjectIDBuildBuildIDCancelNotFound describes a response with status code 404
 Not Found
 */
 type PutProjectIDBuildBuildIDCancelNotFound struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this put project Id build build Id cancel not found response has a 2xx status code
@@ -316,7 +316,7 @@ func (o *PutProjectIDBuildBuildIDCancelNotFound) String() string {
 	return fmt.Sprintf("[PUT /project/{id}/build/{buildId}/cancel][%d] putProjectIdBuildBuildIdCancelNotFound %s", 404, payload)
 }
 
-func (o *PutProjectIDBuildBuildIDCancelNotFound) GetPayload() map[string]string {
+func (o *PutProjectIDBuildBuildIDCancelNotFound) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -341,7 +341,7 @@ PutProjectIDBuildBuildIDCancelInternalServerError describes a response with stat
 Internal Server Error
 */
 type PutProjectIDBuildBuildIDCancelInternalServerError struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this put project Id build build Id cancel internal server error response has a 2xx status code
@@ -384,7 +384,7 @@ func (o *PutProjectIDBuildBuildIDCancelInternalServerError) String() string {
 	return fmt.Sprintf("[PUT /project/{id}/build/{buildId}/cancel][%d] putProjectIdBuildBuildIdCancelInternalServerError %s", 500, payload)
 }
 
-func (o *PutProjectIDBuildBuildIDCancelInternalServerError) GetPayload() map[string]string {
+func (o *PutProjectIDBuildBuildIDCancelInternalServerError) GetPayload() map[string]any {
 	return o.Payload
 }
 

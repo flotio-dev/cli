@@ -55,7 +55,7 @@ DeleteGithubDisconnectOK describes a response with status code 200, with default
 OK
 */
 type DeleteGithubDisconnectOK struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this delete github disconnect o k response has a 2xx status code
@@ -98,7 +98,7 @@ func (o *DeleteGithubDisconnectOK) String() string {
 	return fmt.Sprintf("[DELETE /github/disconnect][%d] deleteGithubDisconnectOK %s", 200, payload)
 }
 
-func (o *DeleteGithubDisconnectOK) GetPayload() map[string]string {
+func (o *DeleteGithubDisconnectOK) GetPayload() map[string]any {
 	return o.Payload
 }
 

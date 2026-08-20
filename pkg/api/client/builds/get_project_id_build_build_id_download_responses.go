@@ -125,7 +125,7 @@ GetProjectIDBuildBuildIDDownloadUnauthorized describes a response with status co
 Unauthorized
 */
 type GetProjectIDBuildBuildIDDownloadUnauthorized struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this get project Id build build Id download unauthorized response has a 2xx status code
@@ -168,7 +168,7 @@ func (o *GetProjectIDBuildBuildIDDownloadUnauthorized) String() string {
 	return fmt.Sprintf("[GET /project/{id}/build/{buildId}/download][%d] getProjectIdBuildBuildIdDownloadUnauthorized %s", 401, payload)
 }
 
-func (o *GetProjectIDBuildBuildIDDownloadUnauthorized) GetPayload() map[string]string {
+func (o *GetProjectIDBuildBuildIDDownloadUnauthorized) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -193,7 +193,7 @@ GetProjectIDBuildBuildIDDownloadNotFound describes a response with status code 4
 Not Found
 */
 type GetProjectIDBuildBuildIDDownloadNotFound struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this get project Id build build Id download not found response has a 2xx status code
@@ -236,7 +236,7 @@ func (o *GetProjectIDBuildBuildIDDownloadNotFound) String() string {
 	return fmt.Sprintf("[GET /project/{id}/build/{buildId}/download][%d] getProjectIdBuildBuildIdDownloadNotFound %s", 404, payload)
 }
 
-func (o *GetProjectIDBuildBuildIDDownloadNotFound) GetPayload() map[string]string {
+func (o *GetProjectIDBuildBuildIDDownloadNotFound) GetPayload() map[string]any {
 	return o.Payload
 }
 

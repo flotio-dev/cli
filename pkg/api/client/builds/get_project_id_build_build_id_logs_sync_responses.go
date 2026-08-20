@@ -131,7 +131,7 @@ GetProjectIDBuildBuildIDLogsSyncBadRequest describes a response with status code
 Bad Request
 */
 type GetProjectIDBuildBuildIDLogsSyncBadRequest struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this get project Id build build Id logs sync bad request response has a 2xx status code
@@ -174,7 +174,7 @@ func (o *GetProjectIDBuildBuildIDLogsSyncBadRequest) String() string {
 	return fmt.Sprintf("[GET /project/{id}/build/{buildId}/logs/sync][%d] getProjectIdBuildBuildIdLogsSyncBadRequest %s", 400, payload)
 }
 
-func (o *GetProjectIDBuildBuildIDLogsSyncBadRequest) GetPayload() map[string]string {
+func (o *GetProjectIDBuildBuildIDLogsSyncBadRequest) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -199,7 +199,7 @@ GetProjectIDBuildBuildIDLogsSyncUnauthorized describes a response with status co
 Unauthorized
 */
 type GetProjectIDBuildBuildIDLogsSyncUnauthorized struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this get project Id build build Id logs sync unauthorized response has a 2xx status code
@@ -242,7 +242,7 @@ func (o *GetProjectIDBuildBuildIDLogsSyncUnauthorized) String() string {
 	return fmt.Sprintf("[GET /project/{id}/build/{buildId}/logs/sync][%d] getProjectIdBuildBuildIdLogsSyncUnauthorized %s", 401, payload)
 }
 
-func (o *GetProjectIDBuildBuildIDLogsSyncUnauthorized) GetPayload() map[string]string {
+func (o *GetProjectIDBuildBuildIDLogsSyncUnauthorized) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -267,7 +267,7 @@ GetProjectIDBuildBuildIDLogsSyncNotFound describes a response with status code 4
 Not Found
 */
 type GetProjectIDBuildBuildIDLogsSyncNotFound struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this get project Id build build Id logs sync not found response has a 2xx status code
@@ -310,7 +310,7 @@ func (o *GetProjectIDBuildBuildIDLogsSyncNotFound) String() string {
 	return fmt.Sprintf("[GET /project/{id}/build/{buildId}/logs/sync][%d] getProjectIdBuildBuildIdLogsSyncNotFound %s", 404, payload)
 }
 
-func (o *GetProjectIDBuildBuildIDLogsSyncNotFound) GetPayload() map[string]string {
+func (o *GetProjectIDBuildBuildIDLogsSyncNotFound) GetPayload() map[string]any {
 	return o.Payload
 }
 

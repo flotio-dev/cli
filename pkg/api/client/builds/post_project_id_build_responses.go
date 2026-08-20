@@ -137,7 +137,7 @@ PostProjectIDBuildBadRequest describes a response with status code 400, with def
 Bad Request
 */
 type PostProjectIDBuildBadRequest struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this post project Id build bad request response has a 2xx status code
@@ -180,7 +180,7 @@ func (o *PostProjectIDBuildBadRequest) String() string {
 	return fmt.Sprintf("[POST /project/{id}/build][%d] postProjectIdBuildBadRequest %s", 400, payload)
 }
 
-func (o *PostProjectIDBuildBadRequest) GetPayload() map[string]string {
+func (o *PostProjectIDBuildBadRequest) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -205,7 +205,7 @@ PostProjectIDBuildUnauthorized describes a response with status code 401, with d
 Unauthorized
 */
 type PostProjectIDBuildUnauthorized struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this post project Id build unauthorized response has a 2xx status code
@@ -248,7 +248,7 @@ func (o *PostProjectIDBuildUnauthorized) String() string {
 	return fmt.Sprintf("[POST /project/{id}/build][%d] postProjectIdBuildUnauthorized %s", 401, payload)
 }
 
-func (o *PostProjectIDBuildUnauthorized) GetPayload() map[string]string {
+func (o *PostProjectIDBuildUnauthorized) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -273,7 +273,7 @@ PostProjectIDBuildNotFound describes a response with status code 404, with defau
 Not Found
 */
 type PostProjectIDBuildNotFound struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this post project Id build not found response has a 2xx status code
@@ -316,7 +316,7 @@ func (o *PostProjectIDBuildNotFound) String() string {
 	return fmt.Sprintf("[POST /project/{id}/build][%d] postProjectIdBuildNotFound %s", 404, payload)
 }
 
-func (o *PostProjectIDBuildNotFound) GetPayload() map[string]string {
+func (o *PostProjectIDBuildNotFound) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -341,7 +341,7 @@ PostProjectIDBuildInternalServerError describes a response with status code 500,
 Internal Server Error
 */
 type PostProjectIDBuildInternalServerError struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this post project Id build internal server error response has a 2xx status code
@@ -384,7 +384,7 @@ func (o *PostProjectIDBuildInternalServerError) String() string {
 	return fmt.Sprintf("[POST /project/{id}/build][%d] postProjectIdBuildInternalServerError %s", 500, payload)
 }
 
-func (o *PostProjectIDBuildInternalServerError) GetPayload() map[string]string {
+func (o *PostProjectIDBuildInternalServerError) GetPayload() map[string]any {
 	return o.Payload
 }
 

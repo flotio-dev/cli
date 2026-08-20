@@ -104,7 +104,7 @@ PostInternalKubernetesPodBuildIDListenInternalServerError describes a response w
 Internal Server Error
 */
 type PostInternalKubernetesPodBuildIDListenInternalServerError struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this post internal kubernetes pod build Id listen internal server error response has a 2xx status code
@@ -147,7 +147,7 @@ func (o *PostInternalKubernetesPodBuildIDListenInternalServerError) String() str
 	return fmt.Sprintf("[POST /internal/kubernetes/pod/{buildID}/listen][%d] postInternalKubernetesPodBuildIdListenInternalServerError %s", 500, payload)
 }
 
-func (o *PostInternalKubernetesPodBuildIDListenInternalServerError) GetPayload() map[string]string {
+func (o *PostInternalKubernetesPodBuildIDListenInternalServerError) GetPayload() map[string]any {
 	return o.Payload
 }
 

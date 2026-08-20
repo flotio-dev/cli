@@ -116,7 +116,7 @@ PostInternalKubernetesSecretInternalServerError describes a response with status
 Internal Server Error
 */
 type PostInternalKubernetesSecretInternalServerError struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this post internal kubernetes secret internal server error response has a 2xx status code
@@ -159,7 +159,7 @@ func (o *PostInternalKubernetesSecretInternalServerError) String() string {
 	return fmt.Sprintf("[POST /internal/kubernetes/secret][%d] postInternalKubernetesSecretInternalServerError %s", 500, payload)
 }
 
-func (o *PostInternalKubernetesSecretInternalServerError) GetPayload() map[string]string {
+func (o *PostInternalKubernetesSecretInternalServerError) GetPayload() map[string]any {
 	return o.Payload
 }
 

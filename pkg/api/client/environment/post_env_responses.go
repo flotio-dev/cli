@@ -134,7 +134,7 @@ PostEnvBadRequest describes a response with status code 400, with default header
 Bad Request
 */
 type PostEnvBadRequest struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this post env bad request response has a 2xx status code
@@ -177,7 +177,7 @@ func (o *PostEnvBadRequest) String() string {
 	return fmt.Sprintf("[POST /env][%d] postEnvBadRequest %s", 400, payload)
 }
 
-func (o *PostEnvBadRequest) GetPayload() map[string]string {
+func (o *PostEnvBadRequest) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -202,7 +202,7 @@ PostEnvUnauthorized describes a response with status code 401, with default head
 Unauthorized
 */
 type PostEnvUnauthorized struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this post env unauthorized response has a 2xx status code
@@ -245,7 +245,7 @@ func (o *PostEnvUnauthorized) String() string {
 	return fmt.Sprintf("[POST /env][%d] postEnvUnauthorized %s", 401, payload)
 }
 
-func (o *PostEnvUnauthorized) GetPayload() map[string]string {
+func (o *PostEnvUnauthorized) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -270,7 +270,7 @@ PostEnvNotFound describes a response with status code 404, with default header v
 Not Found
 */
 type PostEnvNotFound struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this post env not found response has a 2xx status code
@@ -313,7 +313,7 @@ func (o *PostEnvNotFound) String() string {
 	return fmt.Sprintf("[POST /env][%d] postEnvNotFound %s", 404, payload)
 }
 
-func (o *PostEnvNotFound) GetPayload() map[string]string {
+func (o *PostEnvNotFound) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -338,7 +338,7 @@ PostEnvInternalServerError describes a response with status code 500, with defau
 Internal Server Error
 */
 type PostEnvInternalServerError struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this post env internal server error response has a 2xx status code
@@ -381,7 +381,7 @@ func (o *PostEnvInternalServerError) String() string {
 	return fmt.Sprintf("[POST /env][%d] postEnvInternalServerError %s", 500, payload)
 }
 
-func (o *PostEnvInternalServerError) GetPayload() map[string]string {
+func (o *PostEnvInternalServerError) GetPayload() map[string]any {
 	return o.Payload
 }
 

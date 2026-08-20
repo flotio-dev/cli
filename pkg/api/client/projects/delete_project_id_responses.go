@@ -131,7 +131,7 @@ DeleteProjectIDBadRequest describes a response with status code 400, with defaul
 Bad Request
 */
 type DeleteProjectIDBadRequest struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this delete project Id bad request response has a 2xx status code
@@ -174,7 +174,7 @@ func (o *DeleteProjectIDBadRequest) String() string {
 	return fmt.Sprintf("[DELETE /project/{id}][%d] deleteProjectIdBadRequest %s", 400, payload)
 }
 
-func (o *DeleteProjectIDBadRequest) GetPayload() map[string]string {
+func (o *DeleteProjectIDBadRequest) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -199,7 +199,7 @@ DeleteProjectIDUnauthorized describes a response with status code 401, with defa
 Unauthorized
 */
 type DeleteProjectIDUnauthorized struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this delete project Id unauthorized response has a 2xx status code
@@ -242,7 +242,7 @@ func (o *DeleteProjectIDUnauthorized) String() string {
 	return fmt.Sprintf("[DELETE /project/{id}][%d] deleteProjectIdUnauthorized %s", 401, payload)
 }
 
-func (o *DeleteProjectIDUnauthorized) GetPayload() map[string]string {
+func (o *DeleteProjectIDUnauthorized) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -267,7 +267,7 @@ DeleteProjectIDInternalServerError describes a response with status code 500, wi
 Internal Server Error
 */
 type DeleteProjectIDInternalServerError struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this delete project Id internal server error response has a 2xx status code
@@ -310,7 +310,7 @@ func (o *DeleteProjectIDInternalServerError) String() string {
 	return fmt.Sprintf("[DELETE /project/{id}][%d] deleteProjectIdInternalServerError %s", 500, payload)
 }
 
-func (o *DeleteProjectIDInternalServerError) GetPayload() map[string]string {
+func (o *DeleteProjectIDInternalServerError) GetPayload() map[string]any {
 	return o.Payload
 }
 

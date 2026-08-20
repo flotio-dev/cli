@@ -131,7 +131,7 @@ GetProjectIDConfigUnauthorized describes a response with status code 401, with d
 Unauthorized
 */
 type GetProjectIDConfigUnauthorized struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this get project Id config unauthorized response has a 2xx status code
@@ -174,7 +174,7 @@ func (o *GetProjectIDConfigUnauthorized) String() string {
 	return fmt.Sprintf("[GET /project/{id}/config][%d] getProjectIdConfigUnauthorized %s", 401, payload)
 }
 
-func (o *GetProjectIDConfigUnauthorized) GetPayload() map[string]string {
+func (o *GetProjectIDConfigUnauthorized) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -199,7 +199,7 @@ GetProjectIDConfigNotFound describes a response with status code 404, with defau
 Not Found
 */
 type GetProjectIDConfigNotFound struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this get project Id config not found response has a 2xx status code
@@ -242,7 +242,7 @@ func (o *GetProjectIDConfigNotFound) String() string {
 	return fmt.Sprintf("[GET /project/{id}/config][%d] getProjectIdConfigNotFound %s", 404, payload)
 }
 
-func (o *GetProjectIDConfigNotFound) GetPayload() map[string]string {
+func (o *GetProjectIDConfigNotFound) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -267,7 +267,7 @@ GetProjectIDConfigInternalServerError describes a response with status code 500,
 Internal Server Error
 */
 type GetProjectIDConfigInternalServerError struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this get project Id config internal server error response has a 2xx status code
@@ -310,7 +310,7 @@ func (o *GetProjectIDConfigInternalServerError) String() string {
 	return fmt.Sprintf("[GET /project/{id}/config][%d] getProjectIdConfigInternalServerError %s", 500, payload)
 }
 
-func (o *GetProjectIDConfigInternalServerError) GetPayload() map[string]string {
+func (o *GetProjectIDConfigInternalServerError) GetPayload() map[string]any {
 	return o.Payload
 }
 

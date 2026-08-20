@@ -60,7 +60,7 @@ DeleteKeystoreKeystoreIDOK describes a response with status code 200, with defau
 OK
 */
 type DeleteKeystoreKeystoreIDOK struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this delete keystore keystore Id o k response has a 2xx status code
@@ -103,7 +103,7 @@ func (o *DeleteKeystoreKeystoreIDOK) String() string {
 	return fmt.Sprintf("[DELETE /keystore/{keystoreId}][%d] deleteKeystoreKeystoreIdOK %s", 200, payload)
 }
 
-func (o *DeleteKeystoreKeystoreIDOK) GetPayload() map[string]string {
+func (o *DeleteKeystoreKeystoreIDOK) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -128,7 +128,7 @@ DeleteKeystoreKeystoreIDUnauthorized describes a response with status code 401, 
 Unauthorized
 */
 type DeleteKeystoreKeystoreIDUnauthorized struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this delete keystore keystore Id unauthorized response has a 2xx status code
@@ -171,7 +171,7 @@ func (o *DeleteKeystoreKeystoreIDUnauthorized) String() string {
 	return fmt.Sprintf("[DELETE /keystore/{keystoreId}][%d] deleteKeystoreKeystoreIdUnauthorized %s", 401, payload)
 }
 
-func (o *DeleteKeystoreKeystoreIDUnauthorized) GetPayload() map[string]string {
+func (o *DeleteKeystoreKeystoreIDUnauthorized) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -196,7 +196,7 @@ DeleteKeystoreKeystoreIDNotFound describes a response with status code 404, with
 Not Found
 */
 type DeleteKeystoreKeystoreIDNotFound struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this delete keystore keystore Id not found response has a 2xx status code
@@ -239,7 +239,7 @@ func (o *DeleteKeystoreKeystoreIDNotFound) String() string {
 	return fmt.Sprintf("[DELETE /keystore/{keystoreId}][%d] deleteKeystoreKeystoreIdNotFound %s", 404, payload)
 }
 
-func (o *DeleteKeystoreKeystoreIDNotFound) GetPayload() map[string]string {
+func (o *DeleteKeystoreKeystoreIDNotFound) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -264,7 +264,7 @@ DeleteKeystoreKeystoreIDInternalServerError describes a response with status cod
 Internal Server Error
 */
 type DeleteKeystoreKeystoreIDInternalServerError struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this delete keystore keystore Id internal server error response has a 2xx status code
@@ -307,7 +307,7 @@ func (o *DeleteKeystoreKeystoreIDInternalServerError) String() string {
 	return fmt.Sprintf("[DELETE /keystore/{keystoreId}][%d] deleteKeystoreKeystoreIdInternalServerError %s", 500, payload)
 }
 
-func (o *DeleteKeystoreKeystoreIDInternalServerError) GetPayload() map[string]string {
+func (o *DeleteKeystoreKeystoreIDInternalServerError) GetPayload() map[string]any {
 	return o.Payload
 }
 

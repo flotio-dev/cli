@@ -104,7 +104,7 @@ PostInternalKubernetesPodInternalServerError describes a response with status co
 Internal Server Error
 */
 type PostInternalKubernetesPodInternalServerError struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this post internal kubernetes pod internal server error response has a 2xx status code
@@ -147,7 +147,7 @@ func (o *PostInternalKubernetesPodInternalServerError) String() string {
 	return fmt.Sprintf("[POST /internal/kubernetes/pod][%d] postInternalKubernetesPodInternalServerError %s", 500, payload)
 }
 
-func (o *PostInternalKubernetesPodInternalServerError) GetPayload() map[string]string {
+func (o *PostInternalKubernetesPodInternalServerError) GetPayload() map[string]any {
 	return o.Payload
 }
 

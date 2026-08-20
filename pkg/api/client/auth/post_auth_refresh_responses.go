@@ -119,7 +119,7 @@ PostAuthRefreshUnauthorized describes a response with status code 401, with defa
 Unauthorized
 */
 type PostAuthRefreshUnauthorized struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this post auth refresh unauthorized response has a 2xx status code
@@ -162,7 +162,7 @@ func (o *PostAuthRefreshUnauthorized) String() string {
 	return fmt.Sprintf("[POST /auth/refresh][%d] postAuthRefreshUnauthorized %s", 401, payload)
 }
 
-func (o *PostAuthRefreshUnauthorized) GetPayload() map[string]string {
+func (o *PostAuthRefreshUnauthorized) GetPayload() map[string]any {
 	return o.Payload
 }
 

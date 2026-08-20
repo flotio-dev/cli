@@ -131,7 +131,7 @@ PostProjectIDConfigUnauthorized describes a response with status code 401, with 
 Unauthorized
 */
 type PostProjectIDConfigUnauthorized struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this post project Id config unauthorized response has a 2xx status code
@@ -174,7 +174,7 @@ func (o *PostProjectIDConfigUnauthorized) String() string {
 	return fmt.Sprintf("[POST /project/{id}/config][%d] postProjectIdConfigUnauthorized %s", 401, payload)
 }
 
-func (o *PostProjectIDConfigUnauthorized) GetPayload() map[string]string {
+func (o *PostProjectIDConfigUnauthorized) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -199,7 +199,7 @@ PostProjectIDConfigNotFound describes a response with status code 404, with defa
 Not Found
 */
 type PostProjectIDConfigNotFound struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this post project Id config not found response has a 2xx status code
@@ -242,7 +242,7 @@ func (o *PostProjectIDConfigNotFound) String() string {
 	return fmt.Sprintf("[POST /project/{id}/config][%d] postProjectIdConfigNotFound %s", 404, payload)
 }
 
-func (o *PostProjectIDConfigNotFound) GetPayload() map[string]string {
+func (o *PostProjectIDConfigNotFound) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -267,7 +267,7 @@ PostProjectIDConfigInternalServerError describes a response with status code 500
 Internal Server Error
 */
 type PostProjectIDConfigInternalServerError struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this post project Id config internal server error response has a 2xx status code
@@ -310,7 +310,7 @@ func (o *PostProjectIDConfigInternalServerError) String() string {
 	return fmt.Sprintf("[POST /project/{id}/config][%d] postProjectIdConfigInternalServerError %s", 500, payload)
 }
 
-func (o *PostProjectIDConfigInternalServerError) GetPayload() map[string]string {
+func (o *PostProjectIDConfigInternalServerError) GetPayload() map[string]any {
 	return o.Payload
 }
 

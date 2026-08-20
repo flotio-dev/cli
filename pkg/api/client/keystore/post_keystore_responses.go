@@ -122,7 +122,7 @@ PostKeystoreUnauthorized describes a response with status code 401, with default
 Unauthorized
 */
 type PostKeystoreUnauthorized struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this post keystore unauthorized response has a 2xx status code
@@ -165,7 +165,7 @@ func (o *PostKeystoreUnauthorized) String() string {
 	return fmt.Sprintf("[POST /keystore][%d] postKeystoreUnauthorized %s", 401, payload)
 }
 
-func (o *PostKeystoreUnauthorized) GetPayload() map[string]string {
+func (o *PostKeystoreUnauthorized) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -190,7 +190,7 @@ PostKeystoreInternalServerError describes a response with status code 500, with 
 Internal Server Error
 */
 type PostKeystoreInternalServerError struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this post keystore internal server error response has a 2xx status code
@@ -233,7 +233,7 @@ func (o *PostKeystoreInternalServerError) String() string {
 	return fmt.Sprintf("[POST /keystore][%d] postKeystoreInternalServerError %s", 500, payload)
 }
 
-func (o *PostKeystoreInternalServerError) GetPayload() map[string]string {
+func (o *PostKeystoreInternalServerError) GetPayload() map[string]any {
 	return o.Payload
 }
 

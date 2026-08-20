@@ -119,7 +119,7 @@ PostAuthLogoutBadRequest describes a response with status code 400, with default
 Bad Request
 */
 type PostAuthLogoutBadRequest struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this post auth logout bad request response has a 2xx status code
@@ -162,7 +162,7 @@ func (o *PostAuthLogoutBadRequest) String() string {
 	return fmt.Sprintf("[POST /auth/logout][%d] postAuthLogoutBadRequest %s", 400, payload)
 }
 
-func (o *PostAuthLogoutBadRequest) GetPayload() map[string]string {
+func (o *PostAuthLogoutBadRequest) GetPayload() map[string]any {
 	return o.Payload
 }
 

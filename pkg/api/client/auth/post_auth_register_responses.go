@@ -125,7 +125,7 @@ PostAuthRegisterBadRequest describes a response with status code 400, with defau
 Bad Request
 */
 type PostAuthRegisterBadRequest struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this post auth register bad request response has a 2xx status code
@@ -168,7 +168,7 @@ func (o *PostAuthRegisterBadRequest) String() string {
 	return fmt.Sprintf("[POST /auth/register][%d] postAuthRegisterBadRequest %s", 400, payload)
 }
 
-func (o *PostAuthRegisterBadRequest) GetPayload() map[string]string {
+func (o *PostAuthRegisterBadRequest) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -193,7 +193,7 @@ PostAuthRegisterInternalServerError describes a response with status code 500, w
 Internal Server Error
 */
 type PostAuthRegisterInternalServerError struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this post auth register internal server error response has a 2xx status code
@@ -236,7 +236,7 @@ func (o *PostAuthRegisterInternalServerError) String() string {
 	return fmt.Sprintf("[POST /auth/register][%d] postAuthRegisterInternalServerError %s", 500, payload)
 }
 
-func (o *PostAuthRegisterInternalServerError) GetPayload() map[string]string {
+func (o *PostAuthRegisterInternalServerError) GetPayload() map[string]any {
 	return o.Payload
 }
 

@@ -104,7 +104,7 @@ DeleteInternalKubernetesPodBuildIDInternalServerError describes a response with 
 Internal Server Error
 */
 type DeleteInternalKubernetesPodBuildIDInternalServerError struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this delete internal kubernetes pod build Id internal server error response has a 2xx status code
@@ -147,7 +147,7 @@ func (o *DeleteInternalKubernetesPodBuildIDInternalServerError) String() string 
 	return fmt.Sprintf("[DELETE /internal/kubernetes/pod/{buildID}][%d] deleteInternalKubernetesPodBuildIdInternalServerError %s", 500, payload)
 }
 
-func (o *DeleteInternalKubernetesPodBuildIDInternalServerError) GetPayload() map[string]string {
+func (o *DeleteInternalKubernetesPodBuildIDInternalServerError) GetPayload() map[string]any {
 	return o.Payload
 }
 

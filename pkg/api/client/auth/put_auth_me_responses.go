@@ -137,7 +137,7 @@ PutAuthMeBadRequest describes a response with status code 400, with default head
 Bad Request
 */
 type PutAuthMeBadRequest struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this put auth me bad request response has a 2xx status code
@@ -180,7 +180,7 @@ func (o *PutAuthMeBadRequest) String() string {
 	return fmt.Sprintf("[PUT /auth/me][%d] putAuthMeBadRequest %s", 400, payload)
 }
 
-func (o *PutAuthMeBadRequest) GetPayload() map[string]string {
+func (o *PutAuthMeBadRequest) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -205,7 +205,7 @@ PutAuthMeUnauthorized describes a response with status code 401, with default he
 Unauthorized
 */
 type PutAuthMeUnauthorized struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this put auth me unauthorized response has a 2xx status code
@@ -248,7 +248,7 @@ func (o *PutAuthMeUnauthorized) String() string {
 	return fmt.Sprintf("[PUT /auth/me][%d] putAuthMeUnauthorized %s", 401, payload)
 }
 
-func (o *PutAuthMeUnauthorized) GetPayload() map[string]string {
+func (o *PutAuthMeUnauthorized) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -273,7 +273,7 @@ PutAuthMeNotFound describes a response with status code 404, with default header
 Not Found
 */
 type PutAuthMeNotFound struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this put auth me not found response has a 2xx status code
@@ -316,7 +316,7 @@ func (o *PutAuthMeNotFound) String() string {
 	return fmt.Sprintf("[PUT /auth/me][%d] putAuthMeNotFound %s", 404, payload)
 }
 
-func (o *PutAuthMeNotFound) GetPayload() map[string]string {
+func (o *PutAuthMeNotFound) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -341,7 +341,7 @@ PutAuthMeInternalServerError describes a response with status code 500, with def
 Internal Server Error
 */
 type PutAuthMeInternalServerError struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this put auth me internal server error response has a 2xx status code
@@ -384,7 +384,7 @@ func (o *PutAuthMeInternalServerError) String() string {
 	return fmt.Sprintf("[PUT /auth/me][%d] putAuthMeInternalServerError %s", 500, payload)
 }
 
-func (o *PutAuthMeInternalServerError) GetPayload() map[string]string {
+func (o *PutAuthMeInternalServerError) GetPayload() map[string]any {
 	return o.Payload
 }
 

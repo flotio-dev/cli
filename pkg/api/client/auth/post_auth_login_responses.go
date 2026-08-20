@@ -125,7 +125,7 @@ PostAuthLoginBadRequest describes a response with status code 400, with default 
 Bad Request
 */
 type PostAuthLoginBadRequest struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this post auth login bad request response has a 2xx status code
@@ -168,7 +168,7 @@ func (o *PostAuthLoginBadRequest) String() string {
 	return fmt.Sprintf("[POST /auth/login][%d] postAuthLoginBadRequest %s", 400, payload)
 }
 
-func (o *PostAuthLoginBadRequest) GetPayload() map[string]string {
+func (o *PostAuthLoginBadRequest) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -193,7 +193,7 @@ PostAuthLoginUnauthorized describes a response with status code 401, with defaul
 Unauthorized
 */
 type PostAuthLoginUnauthorized struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this post auth login unauthorized response has a 2xx status code
@@ -236,7 +236,7 @@ func (o *PostAuthLoginUnauthorized) String() string {
 	return fmt.Sprintf("[POST /auth/login][%d] postAuthLoginUnauthorized %s", 401, payload)
 }
 
-func (o *PostAuthLoginUnauthorized) GetPayload() map[string]string {
+func (o *PostAuthLoginUnauthorized) GetPayload() map[string]any {
 	return o.Payload
 }
 

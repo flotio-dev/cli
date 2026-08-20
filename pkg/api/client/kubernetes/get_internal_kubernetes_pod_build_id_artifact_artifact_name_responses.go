@@ -116,7 +116,7 @@ GetInternalKubernetesPodBuildIDArtifactArtifactNameInternalServerError describes
 Internal Server Error
 */
 type GetInternalKubernetesPodBuildIDArtifactArtifactNameInternalServerError struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this get internal kubernetes pod build Id artifact artifact name internal server error response has a 2xx status code
@@ -159,7 +159,7 @@ func (o *GetInternalKubernetesPodBuildIDArtifactArtifactNameInternalServerError)
 	return fmt.Sprintf("[GET /internal/kubernetes/pod/{buildID}/artifact/{artifactName}][%d] getInternalKubernetesPodBuildIdArtifactArtifactNameInternalServerError %s", 500, payload)
 }
 
-func (o *GetInternalKubernetesPodBuildIDArtifactArtifactNameInternalServerError) GetPayload() map[string]string {
+func (o *GetInternalKubernetesPodBuildIDArtifactArtifactNameInternalServerError) GetPayload() map[string]any {
 	return o.Payload
 }
 

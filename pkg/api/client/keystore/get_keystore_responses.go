@@ -122,7 +122,7 @@ GetKeystoreUnauthorized describes a response with status code 401, with default 
 Unauthorized
 */
 type GetKeystoreUnauthorized struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this get keystore unauthorized response has a 2xx status code
@@ -165,7 +165,7 @@ func (o *GetKeystoreUnauthorized) String() string {
 	return fmt.Sprintf("[GET /keystore][%d] getKeystoreUnauthorized %s", 401, payload)
 }
 
-func (o *GetKeystoreUnauthorized) GetPayload() map[string]string {
+func (o *GetKeystoreUnauthorized) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -190,7 +190,7 @@ GetKeystoreInternalServerError describes a response with status code 500, with d
 Internal Server Error
 */
 type GetKeystoreInternalServerError struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this get keystore internal server error response has a 2xx status code
@@ -233,7 +233,7 @@ func (o *GetKeystoreInternalServerError) String() string {
 	return fmt.Sprintf("[GET /keystore][%d] getKeystoreInternalServerError %s", 500, payload)
 }
 
-func (o *GetKeystoreInternalServerError) GetPayload() map[string]string {
+func (o *GetKeystoreInternalServerError) GetPayload() map[string]any {
 	return o.Payload
 }
 

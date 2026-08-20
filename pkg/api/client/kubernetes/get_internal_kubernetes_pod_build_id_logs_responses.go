@@ -116,7 +116,7 @@ GetInternalKubernetesPodBuildIDLogsInternalServerError describes a response with
 Internal Server Error
 */
 type GetInternalKubernetesPodBuildIDLogsInternalServerError struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this get internal kubernetes pod build Id logs internal server error response has a 2xx status code
@@ -159,7 +159,7 @@ func (o *GetInternalKubernetesPodBuildIDLogsInternalServerError) String() string
 	return fmt.Sprintf("[GET /internal/kubernetes/pod/{buildID}/logs][%d] getInternalKubernetesPodBuildIdLogsInternalServerError %s", 500, payload)
 }
 
-func (o *GetInternalKubernetesPodBuildIDLogsInternalServerError) GetPayload() map[string]string {
+func (o *GetInternalKubernetesPodBuildIDLogsInternalServerError) GetPayload() map[string]any {
 	return o.Payload
 }
 

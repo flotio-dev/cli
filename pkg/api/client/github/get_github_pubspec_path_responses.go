@@ -55,7 +55,7 @@ GetGithubPubspecPathOK describes a response with status code 200, with default h
 OK
 */
 type GetGithubPubspecPathOK struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this get github pubspec path o k response has a 2xx status code
@@ -98,7 +98,7 @@ func (o *GetGithubPubspecPathOK) String() string {
 	return fmt.Sprintf("[GET /github/pubspec-path][%d] getGithubPubspecPathOK %s", 200, payload)
 }
 
-func (o *GetGithubPubspecPathOK) GetPayload() map[string]string {
+func (o *GetGithubPubspecPathOK) GetPayload() map[string]any {
 	return o.Payload
 }
 

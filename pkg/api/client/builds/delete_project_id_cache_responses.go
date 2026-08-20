@@ -137,7 +137,7 @@ DeleteProjectIDCacheBadRequest describes a response with status code 400, with d
 Bad Request
 */
 type DeleteProjectIDCacheBadRequest struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this delete project Id cache bad request response has a 2xx status code
@@ -180,7 +180,7 @@ func (o *DeleteProjectIDCacheBadRequest) String() string {
 	return fmt.Sprintf("[DELETE /project/{id}/cache][%d] deleteProjectIdCacheBadRequest %s", 400, payload)
 }
 
-func (o *DeleteProjectIDCacheBadRequest) GetPayload() map[string]string {
+func (o *DeleteProjectIDCacheBadRequest) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -205,7 +205,7 @@ DeleteProjectIDCacheUnauthorized describes a response with status code 401, with
 Unauthorized
 */
 type DeleteProjectIDCacheUnauthorized struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this delete project Id cache unauthorized response has a 2xx status code
@@ -248,7 +248,7 @@ func (o *DeleteProjectIDCacheUnauthorized) String() string {
 	return fmt.Sprintf("[DELETE /project/{id}/cache][%d] deleteProjectIdCacheUnauthorized %s", 401, payload)
 }
 
-func (o *DeleteProjectIDCacheUnauthorized) GetPayload() map[string]string {
+func (o *DeleteProjectIDCacheUnauthorized) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -273,7 +273,7 @@ DeleteProjectIDCacheNotFound describes a response with status code 404, with def
 Not Found
 */
 type DeleteProjectIDCacheNotFound struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this delete project Id cache not found response has a 2xx status code
@@ -316,7 +316,7 @@ func (o *DeleteProjectIDCacheNotFound) String() string {
 	return fmt.Sprintf("[DELETE /project/{id}/cache][%d] deleteProjectIdCacheNotFound %s", 404, payload)
 }
 
-func (o *DeleteProjectIDCacheNotFound) GetPayload() map[string]string {
+func (o *DeleteProjectIDCacheNotFound) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -341,7 +341,7 @@ DeleteProjectIDCacheInternalServerError describes a response with status code 50
 Internal Server Error
 */
 type DeleteProjectIDCacheInternalServerError struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this delete project Id cache internal server error response has a 2xx status code
@@ -384,7 +384,7 @@ func (o *DeleteProjectIDCacheInternalServerError) String() string {
 	return fmt.Sprintf("[DELETE /project/{id}/cache][%d] deleteProjectIdCacheInternalServerError %s", 500, payload)
 }
 
-func (o *DeleteProjectIDCacheInternalServerError) GetPayload() map[string]string {
+func (o *DeleteProjectIDCacheInternalServerError) GetPayload() map[string]any {
 	return o.Payload
 }
 

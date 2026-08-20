@@ -48,7 +48,7 @@ GetInternalKubernetesPodBuildIDArtifactsOK describes a response with status code
 OK
 */
 type GetInternalKubernetesPodBuildIDArtifactsOK struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this get internal kubernetes pod build Id artifacts o k response has a 2xx status code
@@ -91,7 +91,7 @@ func (o *GetInternalKubernetesPodBuildIDArtifactsOK) String() string {
 	return fmt.Sprintf("[GET /internal/kubernetes/pod/{buildID}/artifacts][%d] getInternalKubernetesPodBuildIdArtifactsOK %s", 200, payload)
 }
 
-func (o *GetInternalKubernetesPodBuildIDArtifactsOK) GetPayload() map[string]string {
+func (o *GetInternalKubernetesPodBuildIDArtifactsOK) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -116,7 +116,7 @@ GetInternalKubernetesPodBuildIDArtifactsInternalServerError describes a response
 Internal Server Error
 */
 type GetInternalKubernetesPodBuildIDArtifactsInternalServerError struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this get internal kubernetes pod build Id artifacts internal server error response has a 2xx status code
@@ -159,7 +159,7 @@ func (o *GetInternalKubernetesPodBuildIDArtifactsInternalServerError) String() s
 	return fmt.Sprintf("[GET /internal/kubernetes/pod/{buildID}/artifacts][%d] getInternalKubernetesPodBuildIdArtifactsInternalServerError %s", 500, payload)
 }
 
-func (o *GetInternalKubernetesPodBuildIDArtifactsInternalServerError) GetPayload() map[string]string {
+func (o *GetInternalKubernetesPodBuildIDArtifactsInternalServerError) GetPayload() map[string]any {
 	return o.Payload
 }
 

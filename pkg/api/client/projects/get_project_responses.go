@@ -131,7 +131,7 @@ GetProjectUnauthorized describes a response with status code 401, with default h
 Unauthorized
 */
 type GetProjectUnauthorized struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this get project unauthorized response has a 2xx status code
@@ -174,7 +174,7 @@ func (o *GetProjectUnauthorized) String() string {
 	return fmt.Sprintf("[GET /project][%d] getProjectUnauthorized %s", 401, payload)
 }
 
-func (o *GetProjectUnauthorized) GetPayload() map[string]string {
+func (o *GetProjectUnauthorized) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -199,7 +199,7 @@ GetProjectNotFound describes a response with status code 404, with default heade
 Not Found
 */
 type GetProjectNotFound struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this get project not found response has a 2xx status code
@@ -242,7 +242,7 @@ func (o *GetProjectNotFound) String() string {
 	return fmt.Sprintf("[GET /project][%d] getProjectNotFound %s", 404, payload)
 }
 
-func (o *GetProjectNotFound) GetPayload() map[string]string {
+func (o *GetProjectNotFound) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -267,7 +267,7 @@ GetProjectInternalServerError describes a response with status code 500, with de
 Internal Server Error
 */
 type GetProjectInternalServerError struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this get project internal server error response has a 2xx status code
@@ -310,7 +310,7 @@ func (o *GetProjectInternalServerError) String() string {
 	return fmt.Sprintf("[GET /project][%d] getProjectInternalServerError %s", 500, payload)
 }
 
-func (o *GetProjectInternalServerError) GetPayload() map[string]string {
+func (o *GetProjectInternalServerError) GetPayload() map[string]any {
 	return o.Payload
 }
 

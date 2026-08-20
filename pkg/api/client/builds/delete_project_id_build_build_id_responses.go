@@ -137,7 +137,7 @@ DeleteProjectIDBuildBuildIDBadRequest describes a response with status code 400,
 Bad Request
 */
 type DeleteProjectIDBuildBuildIDBadRequest struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this delete project Id build build Id bad request response has a 2xx status code
@@ -180,7 +180,7 @@ func (o *DeleteProjectIDBuildBuildIDBadRequest) String() string {
 	return fmt.Sprintf("[DELETE /project/{id}/build/{buildId}][%d] deleteProjectIdBuildBuildIdBadRequest %s", 400, payload)
 }
 
-func (o *DeleteProjectIDBuildBuildIDBadRequest) GetPayload() map[string]string {
+func (o *DeleteProjectIDBuildBuildIDBadRequest) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -205,7 +205,7 @@ DeleteProjectIDBuildBuildIDUnauthorized describes a response with status code 40
 Unauthorized
 */
 type DeleteProjectIDBuildBuildIDUnauthorized struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this delete project Id build build Id unauthorized response has a 2xx status code
@@ -248,7 +248,7 @@ func (o *DeleteProjectIDBuildBuildIDUnauthorized) String() string {
 	return fmt.Sprintf("[DELETE /project/{id}/build/{buildId}][%d] deleteProjectIdBuildBuildIdUnauthorized %s", 401, payload)
 }
 
-func (o *DeleteProjectIDBuildBuildIDUnauthorized) GetPayload() map[string]string {
+func (o *DeleteProjectIDBuildBuildIDUnauthorized) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -273,7 +273,7 @@ DeleteProjectIDBuildBuildIDNotFound describes a response with status code 404, w
 Not Found
 */
 type DeleteProjectIDBuildBuildIDNotFound struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this delete project Id build build Id not found response has a 2xx status code
@@ -316,7 +316,7 @@ func (o *DeleteProjectIDBuildBuildIDNotFound) String() string {
 	return fmt.Sprintf("[DELETE /project/{id}/build/{buildId}][%d] deleteProjectIdBuildBuildIdNotFound %s", 404, payload)
 }
 
-func (o *DeleteProjectIDBuildBuildIDNotFound) GetPayload() map[string]string {
+func (o *DeleteProjectIDBuildBuildIDNotFound) GetPayload() map[string]any {
 	return o.Payload
 }
 
@@ -341,7 +341,7 @@ DeleteProjectIDBuildBuildIDInternalServerError describes a response with status 
 Internal Server Error
 */
 type DeleteProjectIDBuildBuildIDInternalServerError struct {
-	Payload map[string]string
+	Payload map[string]any
 }
 
 // IsSuccess returns true when this delete project Id build build Id internal server error response has a 2xx status code
@@ -384,7 +384,7 @@ func (o *DeleteProjectIDBuildBuildIDInternalServerError) String() string {
 	return fmt.Sprintf("[DELETE /project/{id}/build/{buildId}][%d] deleteProjectIdBuildBuildIdInternalServerError %s", 500, payload)
 }
 
-func (o *DeleteProjectIDBuildBuildIDInternalServerError) GetPayload() map[string]string {
+func (o *DeleteProjectIDBuildBuildIDInternalServerError) GetPayload() map[string]any {
 	return o.Payload
 }
 
