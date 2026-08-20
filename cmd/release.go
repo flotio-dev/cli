@@ -21,9 +21,9 @@ var releaseCmd = &cobra.Command{
 }
 
 var releasePublishCmd = &cobra.Command{
-	Use:     "publish [project-id] <build-id>",
-	Short:   "Publish a successful build to Google Play",
-	Args:    cobra.RangeArgs(1, 2),
+	Use:   "publish [project-id] <build-id>",
+	Short: "Publish a successful build to Google Play",
+	Args:  cobra.RangeArgs(1, 2),
 	Example: `  flotio release publish 42
   flotio release publish 3 42 --track production --notes "Bug fixes"`,
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -134,9 +134,9 @@ var releaseGetCmd = &cobra.Command{
 }
 
 var releaseListCmd = &cobra.Command{
-	Use:     "list [project-id]",
-	Short:   "List releases for a project",
-	Args:    cobra.MaximumNArgs(1),
+	Use:   "list [project-id]",
+	Short: "List releases for a project",
+	Args:  cobra.MaximumNArgs(1),
 	Example: `  flotio release list
   flotio release list 3`,
 	RunE: func(cmd *cobra.Command, args []string) error {

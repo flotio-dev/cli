@@ -247,9 +247,9 @@ func flagStr(cmd *cobra.Command, name string) string {
 // --- TTY interactive config update ---
 
 type field struct {
-	key    string
-	label  string
-	typ    string // "string", "bool", "int", "float", "slice"
+	key       string
+	label     string
+	typ       string // "string", "bool", "int", "float", "slice"
 	sensitive bool
 }
 

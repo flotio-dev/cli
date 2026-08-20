@@ -129,11 +129,11 @@ var buildListCmd = &cobra.Command{
 }
 
 var buildLogsCmd = &cobra.Command{
-	Use:     "logs [project-id] <build-id>",
-	Short:   "Get build logs",
+	Use:   "logs [project-id] <build-id>",
+	Short: "Get build logs",
 	Example: `  flotio build logs 42
   flotio build logs --watch 42`,
-	Args:    cobra.RangeArgs(1, 2),
+	Args: cobra.RangeArgs(1, 2),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if !client.IsLoggedIn() {
 			return fmt.Errorf("not logged in")
