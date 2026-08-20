@@ -50,10 +50,10 @@ The script detects your OS/architecture, downloads the latest release, and insta
 If you have the Go toolchain (1.26+):
 
 ```sh
-go install github.com/flotio-dev/cli@latest
+go install github.com/flotio-dev/cli/cmd/flotio@latest
 ```
 
-This places the binary in `$GOBIN` (or `$GOPATH/bin`).
+This places the `flotio` binary in `$GOBIN` (or `$GOPATH/bin`).
 
 ### Option 3 — Build from source
 
