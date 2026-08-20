@@ -19,6 +19,7 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  # Vérifie le formatage, les modules, go vet et les tests Go avec le détecteur de data races.
   quality:
     name: Quality and tests
     runs-on: ubuntu-24.04
@@ -49,6 +50,7 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
+  # Contrôle les dépendances si disponible puis bloque les vulnérabilités et secrets avec Trivy.
   security-source:
     name: Source security
     runs-on: ubuntu-24.04
@@ -76,6 +78,7 @@ jobs:
           timeout: 15m
           version: v0.74.0
 
+  # Analyse statiquement le code Go avec CodeQL lorsque GitHub Code Security est disponible.
   codeql:
     name: CodeQL
     runs-on: ubuntu-24.04
@@ -113,6 +116,7 @@ jobs:
         if: github.event.repository.private && vars.CODEQL_ENABLED != 'true'
         run: echo "::notice::Enable GitHub Code Security, then set CODEQL_ENABLED=true to enforce CodeQL."
 
+  # Compile et contrôle le binaire pour chaque combinaison de système et d'architecture supportée.
   build:
     name: Build ${{ matrix.os }}/${{ matrix.arch }}
     needs: [quality, security-source, codeql]
@@ -171,6 +175,7 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
+  # Produit les archives de release, leurs checksums et les publie pour un tag SemVer.
   release:
     name: Release
     if: startsWith(github.ref, 'refs/tags/')
@@ -231,6 +236,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: gh release create "$GITHUB_REF_NAME" dist/* sbom.spdx.json --verify-tag --generate-notes
 
+  # Agrège les résultats obligatoires en un check stable utilisable par la protection de branche.
   ci-success:
     name: ci-success
     if: ${{ always() }}
