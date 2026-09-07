@@ -10,9 +10,11 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 
 	apiclient "github.com/flotio-dev/cli/pkg/api/client"
+	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 )
@@ -119,13 +121,20 @@ func Relogin(baseURL string) error {
 }
 
 // DoRefresh exchanges a refresh token for a new access+refresh pair via
-// POST /auth/refresh (the token is sent as a cookie, as the API expects).
+// POST /auth/refresh (sending the token in JSON body, cookie, and Bearer header for maximum compatibility).
 func DoRefresh(baseURL, refreshToken string) error {
-	req, err := http.NewRequest("POST", baseURL+"/auth/refresh", nil)
+	body := map[string]string{
+		"refresh_token": refreshToken,
+	}
+	data, _ := json.Marshal(body)
+
+	req, err := http.NewRequest("POST", baseURL+"/auth/refresh", bytes.NewReader(data))
 	if err != nil {
 		return err
 	}
 	req.AddCookie(&http.Cookie{Name: "refresh_token", Value: refreshToken})
+	req.Header.Set("Authorization", "Bearer "+refreshToken)
+	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
 
 	resp, err := httpClient.Do(req)
@@ -207,27 +216,157 @@ func tokenPath() (string, error) {
 	return TokenPathFn()
 }
 
+// AuthRoundTripper wraps an http.RoundTripper and automatically intercepts
+// 401 Unauthorized responses to perform refresh-token rotation and retry the
+// original request with the renewed access token.
+type AuthRoundTripper struct {
+	BaseURL      string
+	Wrapped      http.RoundTripper
+	refreshMutex sync.Mutex
+}
+
+// NewAuthRoundTripper creates an AuthRoundTripper with the given baseURL and underlying transport.
+func NewAuthRoundTripper(baseURL string, wrapped http.RoundTripper) *AuthRoundTripper {
+	if wrapped == nil {
+		wrapped = http.DefaultTransport
+	}
+	return &AuthRoundTripper{
+		BaseURL: strings.TrimRight(baseURL, "/"),
+		Wrapped: wrapped,
+	}
+}
+
+func isAuthEndpoint(path string) bool {
+	return strings.HasSuffix(path, "/auth/login") ||
+		strings.HasSuffix(path, "/auth/refresh") ||
+		strings.HasSuffix(path, "/auth/register")
+}
+
+// RoundTrip executes a single HTTP transaction. If 401 is received on a non-auth endpoint,
+// it refreshes tokens and transparently retries the request with the new access token.
+func (rt *AuthRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
+	// Do not intercept auth endpoints to avoid recursion
+	if isAuthEndpoint(req.URL.Path) {
+		return rt.Wrapped.RoundTrip(req)
+	}
+
+	// Buffer body if needed so we can rewind and replay on retry
+	if req.Body != nil && req.GetBody == nil {
+		bodyBytes, err := io.ReadAll(req.Body)
+		if err != nil {
+			return nil, fmt.Errorf("buffering request body: %w", err)
+		}
+		_ = req.Body.Close()
+		req.Body = io.NopCloser(bytes.NewReader(bodyBytes))
+		req.GetBody = func() (io.ReadCloser, error) {
+			return io.NopCloser(bytes.NewReader(bodyBytes)), nil
+		}
+	}
+
+	// Track initial token used
+	initialToken := ""
+	authHeader := req.Header.Get("Authorization")
+	if strings.HasPrefix(authHeader, "Bearer ") {
+		initialToken = strings.TrimPrefix(authHeader, "Bearer ")
+	} else {
+		if tokens, _ := LoadTokens(); tokens != nil && tokens.AccessToken != "" {
+			initialToken = tokens.AccessToken
+			req.Header.Set("Authorization", "Bearer "+initialToken)
+		}
+	}
+
+	resp, err := rt.Wrapped.RoundTrip(req)
+	if err != nil {
+		return resp, err
+	}
+
+	if resp.StatusCode != http.StatusUnauthorized {
+		return resp, nil
+	}
+
+	// 401 Unauthorized received — attempt token refresh
+	rt.refreshMutex.Lock()
+	defer rt.refreshMutex.Unlock()
+
+	// Check if another concurrent request already refreshed the token
+	currentTokens, err := LoadTokens()
+	if err == nil && currentTokens != nil && currentTokens.AccessToken != "" && currentTokens.AccessToken != initialToken {
+		_ = resp.Body.Close()
+		retryReq := req.Clone(req.Context())
+		retryReq.Header.Set("Authorization", "Bearer "+currentTokens.AccessToken)
+		if req.GetBody != nil {
+			body, bodyErr := req.GetBody()
+			if bodyErr != nil {
+				return nil, bodyErr
+			}
+			retryReq.Body = body
+		}
+		return rt.Wrapped.RoundTrip(retryReq)
+	}
+
+	// If no refresh token is stored, we cannot refresh
+	if currentTokens == nil || currentTokens.RefreshToken == "" {
+		_ = resp.Body.Close()
+		_ = ClearTokens()
+		return nil, fmt.Errorf("session expired: please run 'flotio login' to authenticate again")
+	}
+
+	// Perform refresh
+	if refreshErr := DoRefresh(rt.BaseURL, currentTokens.RefreshToken); refreshErr != nil {
+		_ = resp.Body.Close()
+		_ = ClearTokens()
+		return nil, fmt.Errorf("session expired: please run 'flotio login' to authenticate again (refresh failed: %w)", refreshErr)
+	}
+
+	newTokens, err := LoadTokens()
+	if err != nil || newTokens == nil || newTokens.AccessToken == "" {
+		_ = resp.Body.Close()
+		_ = ClearTokens()
+		return nil, fmt.Errorf("session expired: please run 'flotio login' to authenticate again")
+	}
+
+	_ = resp.Body.Close()
+	retryReq := req.Clone(req.Context())
+	retryReq.Header.Set("Authorization", "Bearer "+newTokens.AccessToken)
+	if req.GetBody != nil {
+		body, bodyErr := req.GetBody()
+		if bodyErr != nil {
+			return nil, bodyErr
+		}
+		retryReq.Body = body
+	}
+
+	return rt.Wrapped.RoundTrip(retryReq)
+}
+
 // New creates a new Flotio API client connected to the given host.
 // If a valid access token is stored, it is injected as Bearer auth.
+// An AuthRoundTripper is attached to automatically handle refresh token rotation on 401.
 // The host can be a plain hostname or scheme://host (scheme is extracted).
 func New(rawHost string) *apiclient.FlotioAPI {
 	scheme, host := parseHost(rawHost)
 	schemes := []string{scheme}
 	transport := httptransport.New(host, "/", schemes)
 
-	// Inject stored bearer token if available.
-	tokens, _ := LoadTokens()
-	if tokens != nil && tokens.AccessToken != "" {
-		transport.DefaultAuthentication = httptransport.BearerToken(tokens.AccessToken)
-	}
+	baseURL := fmt.Sprintf("%s://%s", scheme, host)
+	transport.Transport = NewAuthRoundTripper(baseURL, transport.Transport)
+
+	// Inject dynamic bearer token so updated tokens are always used on new requests.
+	transport.DefaultAuthentication = runtime.ClientAuthInfoWriterFunc(func(req runtime.ClientRequest, reg strfmt.Registry) error {
+		tokens, _ := LoadTokens()
+		if tokens != nil && tokens.AccessToken != "" {
+			return req.SetHeaderParam("Authorization", "Bearer "+tokens.AccessToken)
+		}
+		return nil
+	})
 
 	return apiclient.New(transport, strfmt.Default)
 }
 
-// IsLoggedIn returns true if a valid-looking token is stored.
+// IsLoggedIn returns true if a valid-looking token or refresh token is stored.
 func IsLoggedIn() bool {
 	tokens, _ := LoadTokens()
-	return tokens != nil && tokens.AccessToken != ""
+	return tokens != nil && (tokens.AccessToken != "" || tokens.RefreshToken != "")
 }
 
 // apiDo is a helper that performs an authenticated HTTP request
@@ -273,6 +412,7 @@ func apiDoWithToken(method, baseURL, path string, body io.Reader, v interface{},
 	if resp.StatusCode == 401 {
 		// Access token expired — try refresh-token rotation once, then retry.
 		if err := Relogin(baseURL); err != nil {
+			_ = ClearTokens()
 			errBody, _ := io.ReadAll(io.LimitReader(resp.Body, 4096))
 			return fmt.Errorf("session expired (refresh failed: %v): %s\n\nRun 'flotio login' again.", err, string(errBody))
 		}
